@@ -2835,11 +2835,12 @@ static int cgroup_attach_task(struct cgroup *dst_cgrp,
 	return ret;
 }
 
-int subsys_cgroup_allow_attach(struct cgroup_taskset *tset)
+
+
+int subsys_cgroup_allow_attach(struct cgroup_subsys_state *css, struct cgroup_taskset *tset)
 {
 	const struct cred *cred = current_cred(), *tcred;
 	struct task_struct *task;
-	struct cgroup_subsys_state *css;
 
 	if (capable(CAP_SYS_NICE))
 		return 0;
@@ -2850,25 +2851,6 @@ int subsys_cgroup_allow_attach(struct cgroup_taskset *tset)
 		if (current != task && !uid_eq(cred->euid, tcred->uid) &&
 		    !uid_eq(cred->euid, tcred->suid))
 			return -EACCES;
-	}
-
-	return 0;
-}
-
-static int cgroup_allow_attach(struct cgroup *cgrp, struct cgroup_taskset *tset)
-{
-	struct cgroup_subsys_state *css;
-	int i;
-	int ret;
-
-	for_each_css(css, i, cgrp) {
-		if (css->ss->allow_attach) {
-			ret = css->ss->allow_attach(tset);
-			if (ret)
-				return ret;
-		} else {
-			return -EACCES;
-		}
 	}
 
 	return 0;
@@ -3137,7 +3119,7 @@ static int cgroup_update_dfl_csses(struct cgroup *cgrp)
 
 	/* look up all csses currently attached to @cgrp's subtree */
 	spin_lock_bh(&css_set_lock);
-	css_for_each_descendant_pre(css, cgroup_css(cgrp, NULL)) {
+	css_for_each_descendant_pre(dsct, cgroup_css(cgrp, NULL)) {
 		struct cgrp_cset_link *link;
 
 		list_for_each_entry(link, &dsct->cset_links, cset_link)
