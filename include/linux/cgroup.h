@@ -80,6 +80,7 @@ struct cgroup_subsys_state *cgroup_get_e_css(struct cgroup *cgroup,
 					     struct cgroup_subsys *ss);
 struct cgroup_subsys_state *css_tryget_online_from_dir(struct dentry *dentry,
 						       struct cgroup_subsys *ss);
+struct cgroup *cgroup_get_from_path(const char *path);
 #ifdef CONFIG_ROW_OPTIMIZATION
 extern int cgroup_update_ioprio(struct cgroup_subsys_state *css, int ioprio);
 #endif
@@ -383,6 +384,11 @@ static inline void css_put_many(struct cgroup_subsys_state *css, unsigned int n)
 {
 	if (!(css->flags & CSS_NO_REF))
 		percpu_ref_put_many(&css->refcnt, n);
+}
+
+static inline void cgroup_put(struct cgroup *cgrp)
+{
+	css_put(&cgrp->self);
 }
 
 /**
