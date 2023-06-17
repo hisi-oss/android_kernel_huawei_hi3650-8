@@ -21,9 +21,9 @@ void irda_maxim_power_config_unregist(void);
 /**
 * regist irda chip type driver
 */
-int irda_chip_type_regist(viod);
+int irda_chip_type_regist(void);
 
 /**
 * unregist irda chip type driver
 */
-void irda_chip_type_unregist(viod);
+void irda_chip_type_unregist(void);
