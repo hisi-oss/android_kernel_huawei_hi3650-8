@@ -3006,7 +3006,7 @@ static int fsa9685_parse_dts(struct device_node* np)
 	if (ret)
 	{
 		hwlog_err("scp_need_extra_power failed\n");
-		return;
+		return -1;
 	}
 	hwlog_info("scp_need_extra_power = %d\n", scp_need_extra_power);
 	if (scp_need_extra_power)
