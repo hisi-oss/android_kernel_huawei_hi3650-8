@@ -144,8 +144,6 @@ void pm_gic_pending_dump(void)
 				if (gpio >= 0) {
 					printk("(gpio-%d)", gpio);
                 }
-				/* notify dubai module to update wakeup information */
-				dubai_update_wakeup_info(g_ap_irq_name[irq], gpio);
 				printk("\n");
 			}
 		}
