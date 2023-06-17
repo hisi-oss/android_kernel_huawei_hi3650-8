@@ -709,25 +709,6 @@ u32 rdr_get_reboot_type(void)
 	return g_reboot_type;
 }
 
-static int __init early_parse_reboot_reason_cmdline(char *reboot_reason_cmdline)
-{
-	int i;
-	printk("[%s]\n", __func__);
-	memset(g_reboot_reason, 0x0, RDR_REBOOT_REASON_LEN);
-	memcpy(g_reboot_reason, reboot_reason_cmdline, RDR_REBOOT_REASON_LEN - 1);
-
-	for (i = 0; (u32)i < get_reboot_reason_map_size(); i++) {
-		if (!strncmp((char *)reboot_reason_map[i].name, g_reboot_reason, RDR_REBOOT_REASON_LEN)) {
-			g_reboot_type = reboot_reason_map[i].num;
-			break;
-		}
-	}
-	printk("[%s][%s][%d]\n", __func__, g_reboot_reason, g_reboot_type);
-	return 0;
-}
-
-early_param("reboot_reason", early_parse_reboot_reason_cmdline);
-
 void *bbox_vmap(phys_addr_t paddr, size_t size)
 {
 	int i;
