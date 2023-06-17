@@ -63,9 +63,9 @@ extern "C"
 #include "bsp_dump_mem.h"
 
 /**************************************************************************
-  宏定义
+  ??????
 **************************************************************************/
-/*APP段内存分配*/
+/*APP??????????*/
 #if 0
 #define DUMP_BASE_INFO_ADDR                 (DUMP_AREA_AP_STATIC_ADDR)
 #define DUMP_BASE_INFO_SIZE                 (0x180)
@@ -84,7 +84,7 @@ extern "C"
 #define DUMP_PRINT_ADDR                     (DUMP_ALLTASK_TCB_ADDR+DUMP_ALLTASK_TCB_SIZE)
 #define DUMP_PRINT_SIZE                     (0x4000)
 #define DUMP_REGS_ADDR                      (DUMP_PRINT_ADDR+DUMP_PRINT_SIZE)
-#define DUMP_REGS_SIZE                      (0x3000)                                     // 待定
+#define DUMP_REGS_SIZE                      (0x3000)                                     // ????
 #define DUMP_CPUVIEW_ADDR                   (DUMP_REGS_ADDR+DUMP_REGS_SIZE)
 #define DUMP_CPUVIEW_SIZE                   (0)
 #define DUMP_USER_DATA_ADDR                 (DUMP_CPUVIEW_ADDR+DUMP_CPUVIEW_SIZE)
@@ -108,7 +108,7 @@ extern "C"
 
 
 /**************************************************************************
-  STRUCT定义
+  STRUCT????
 **************************************************************************/
 #ifndef FUNC_VOID
 typedef void (*func_void_t)(void);
@@ -127,7 +127,7 @@ typedef struct _dump_ctrl_s
 typedef struct
 {
     u32 wdtSwitch;
-    u32 wdtTimerOut;  /*看门狗超时时间，单位ms*/
+    u32 wdtTimerOut;  /*????????????????????ms*/
     u32 sys_view;
 
     union
@@ -136,11 +136,11 @@ typedef struct
         struct
         {
             u32 sci_switch     : 1; /* 00: excdump, 01: usbdump, 1x: no dump */
-            u32 usb_switch     : 1; /* 2 ARM异常检测开关*/
-            u32 pmu_switch     : 1; /* 3 堆栈溢出检测开关*/
-            u32 sd_switch      : 1; /* 3 堆栈溢出检测开关*/
-            u32 icc_switch     : 1; /* 3 堆栈溢出检测开关*/
-            u32 ifc_switch     : 1; /* 4 任务切换记录开关*/
+            u32 usb_switch     : 1; /* 2 ARM????????????*/
+            u32 pmu_switch     : 1; /* 3 ????????????????*/
+            u32 sd_switch      : 1; /* 3 ????????????????*/
+            u32 icc_switch     : 1; /* 3 ????????????????*/
+            u32 ifc_switch     : 1; /* 4 ????????????????*/
             u32 reserved1      : 26;
         } Bits;
     } mod_cfg;
@@ -148,11 +148,11 @@ typedef struct
 
 
 /**************************************************************************
-  UNION定义
+  UNION????
 **************************************************************************/
 
 /**************************************************************************
-  OTHERS定义
+  OTHERS????
 **************************************************************************/
 #define dump_debug(fmt, ...)    (bsp_trace(BSP_LOG_LEVEL_ERROR,   BSP_MODU_DUMP, "[MODEM_DUMP]: <%s> "fmt, __FUNCTION__, ##__VA_ARGS__))
 #define dump_warning(fmt, ...)  (bsp_trace(BSP_LOG_LEVEL_WARNING, BSP_MODU_DUMP, "[MODEM_DUMP]: <%s> "fmt, __FUNCTION__, ##__VA_ARGS__))
@@ -160,7 +160,7 @@ typedef struct
 #define dump_fetal(fmt, ...)    (bsp_trace(BSP_LOG_LEVEL_FATAL,   BSP_MODU_DUMP, "[MODEM_DUMP]: <%s> "fmt, __FUNCTION__, ##__VA_ARGS__))
 
 /**************************************************************************
-  函数声明
+  ????????
 **************************************************************************/
 
 

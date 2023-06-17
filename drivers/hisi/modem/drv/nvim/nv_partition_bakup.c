@@ -289,13 +289,13 @@ bool nv_bakup_validity(void)
     u32 ret;
     nv_ctrl_info_s *bakup_ctrl;
 
-    /*文件不存在*/
+    /*??????????*/
     if(nv_file_access((s8*)NV_BACK_PATH,0))
     {
         return false;
     }
 
-    /*有未写入完成的标志 */
+    /*?????????????????? */
     if(true == nv_flag_file_isExist((s8*)NV_BACK_FLAG_PATH))
     {
         nv_mntn_record("%s  last time write abornormal !\n",NV_BACK_FLAG_PATH);
@@ -308,7 +308,7 @@ bool nv_bakup_validity(void)
         return false;
     }
 
-    /*imei号检查*/
+    /*imei??????*/
     /*
     ret = nv_imei_data_comp((s8*)filePath);
     if(ret)
@@ -483,11 +483,11 @@ out1:
 }
 
 /*****************************************************************************
- 函 数 名  : nv_resume_item_from_img
- 功能描述  : 从工作恢复一个NV项
- 输入参数  : void
- 输出参数  : 无
- 返 回 值  : 无
+ ?? ?? ??  : nv_resume_item_from_img
+ ????????  : ??????????????NV??
+ ????????  : void
+ ????????  : ??
+ ?? ?? ??  : ??
 *****************************************************************************/
 u32 nv_bakup_resume_item(nv_item_info_s *item_info, u32 modem_id)
 {

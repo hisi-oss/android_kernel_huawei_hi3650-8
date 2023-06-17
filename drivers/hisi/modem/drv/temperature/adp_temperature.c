@@ -121,7 +121,7 @@ s32 drv_hkadc_get_temp(HKADC_TEMP_PROTECT_E enMode, unsigned short* pusVolt, sho
     volt   = p_area->chan_out[phy_chan].volt_l;
     //volt_r = p_area->chan_out[phy_chan].volt_r;
 
-    /*取反校验暂时不判断*/
+    /*??????????????????*/
     if(NULL != pusVolt)
     {
         *pusVolt = volt;

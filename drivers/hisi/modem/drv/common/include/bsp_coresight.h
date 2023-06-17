@@ -53,11 +53,11 @@ extern "C"
 {
 #endif
 
-/* Trace采集配置 */
+/* Trace???????? */
 enum capt_ctrl_enum
 {
-    AP_CORE_SET,            /* 采集AP */
-    CP_CORE_SET,            /* 采集CP */
+    AP_CORE_SET,            /* ????AP */
+    CP_CORE_SET,            /* ????CP */
     CAPT_CTRL_BUTT
 };
 
@@ -66,7 +66,7 @@ enum capt_ctrl_enum
 #define DUMP_CP_UTRACE_SIZE  0x2400
 
 #ifdef CONFIG_CORESIGHT
-#if !defined(CONFIG_HISI_DUMP) && defined(__KERNEL__) /*linux以及PHONE形态*/
+#if !defined(CONFIG_HISI_DUMP) && defined(__KERNEL__) /*linux????PHONE????*/
 static unsigned int inline  bsp_coresight_init(void)   {  return 0; }
 static void inline bsp_coresight_enable(void) {  return;   }
 static void inline bsp_coresight_disable(void){  return;   }

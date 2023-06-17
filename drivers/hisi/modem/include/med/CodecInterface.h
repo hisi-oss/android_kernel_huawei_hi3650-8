@@ -50,7 +50,7 @@
 #define __CODECINTERFACE_H__
 
 /*****************************************************************************
-  1 其他头文件包含
+  1 ??????????????
 *****************************************************************************/
 #include "vos.h"
 #include "VcCodecInterface.h"
@@ -64,57 +64,57 @@ extern "C" {
 
 
 /*****************************************************************************
-  2 宏定义
+  2 ??????
 *****************************************************************************/
-#define HIFI_TASK_NUM                   (4)                                     /* HiFi操作系统支持任务个数 */
-#define HIFI_INTR_NUM                   (32)                                    /* HiFi系统中断个数         */
-#define VOICE_MAX_HOOK_LEN              (640*3)                                 /* 语音最大钩取数据长度，单位2 Byte */
-#define AUDIO_MAX_HOOK_LEN              (3840)                                  /* 音频最大钩取数据长度，单位2 Byte，暂定 */
-#define WPHY_VOICE_AMR_SUBFRAME_NUM     (3)                                     /* W物理层与CODEC交互的语音数据子帧个数 */
-#define WPHY_VOICE_AMR_FRAME_LEN        (16)                                    /* W物理层与CODEC交互的语音数据长度,单位32Bit,上下行长度一致 */
+#define HIFI_TASK_NUM                   (4)                                     /* HiFi???????????????????? */
+#define HIFI_INTR_NUM                   (32)                                    /* HiFi????????????         */
+#define VOICE_MAX_HOOK_LEN              (640*3)                                 /* ??????????????????????????2 Byte */
+#define AUDIO_MAX_HOOK_LEN              (3840)                                  /* ??????????????????????????2 Byte?????? */
+#define WPHY_VOICE_AMR_SUBFRAME_NUM     (3)                                     /* W????????CODEC?????????????????????? */
+#define WPHY_VOICE_AMR_FRAME_LEN        (16)                                    /* W????????CODEC??????????????????,????32Bit,?????????????? */
 
-/*WPHY_CODEC_DATA_STRU结构含义如下
-uhwQualityIdx   --AMR帧质量标志, 0表示
-auhwLen         --依次存放A/B/C子流的长度，以BIT为单位
-auwData         --依次存放A/B/C子流数据，ABC子流分别32BIT对齐*/
+/*WPHY_CODEC_DATA_STRU????????????
+uhwQualityIdx   --AMR??????????, 0????
+auhwLen         --????????A/B/C??????????????BIT??????
+auwData         --????????A/B/C??????????ABC????????32BIT????*/
 #define WPHY_VOICE_DATA_STRU                                                      \
     CODEC_AMR_FQI_QUALITY_ENUM_UINT16       enQualityIdx;                         \
     VOS_UINT16                              auhwLen[WPHY_VOICE_AMR_SUBFRAME_NUM]; \
     VOS_UINT32                              auwData[WPHY_VOICE_AMR_FRAME_LEN];
 
 /*****************************************************************************
-  3 枚举定义
+  3 ????????
 *****************************************************************************/
 
 enum VOICE_VOICE_MSG_ID_ENUM
 {
-    ID_VOICE_VOICE_TX_PP_REQ          = 0xDD30,           /* 单板测试使用, 用于触发上行PP处理 */
-    ID_VOICE_VOICE_RX_PP_REQ          = 0xDD31,           /* 单板测试使用, 用于触发下行PP处理 */
+    ID_VOICE_VOICE_TX_PP_REQ          = 0xDD30,           /* ????????????, ????????????PP???? */
+    ID_VOICE_VOICE_RX_PP_REQ          = 0xDD31,           /* ????????????, ????????????PP???? */
     VOICE_VOICE_MSG_ID_BUTT
 };
 typedef VOS_UINT16 VOICE_VOICE_MSG_ID_ENUM_UINT16;
 
 /*****************************************************************************
- 枚举名    : UCOM_RET_ENUM
- 枚举说明  : 消息及函数执行结果
+ ??????    : UCOM_RET_ENUM
+ ????????  : ??????????????????
 *****************************************************************************/
 enum UCOM_RET_ENUM
 {
-    UCOM_RET_SUCC                       = VOS_OK,                               /*成功*/
-    UCOM_RET_FAIL                       = VOS_ERR,                              /*失败*/
-    UCOM_RET_NUL_PTR                    = 2,                                    /*空指针*/
-    UCOM_RET_ERR_PARA                   = 3,                                    /*参数错误*/
-    UCOM_RET_ERR_STATE                  = 4,                                    /*状态错误*/
-    UCOM_RET_ERR_MSG                    = 5,                                    /*未知消息*/
-    UCOM_RET_ERR_NOMEM                  = 6,                                    /*空间不足*/
-    UCOM_RET_FUNC_DISABLE               = 7,                                    /*功能不支持*/
-    UCOM_RET_SEND_FAIL                  = 8,                                    /*消息发送失败*/
-    UCOM_RET_MSG_DELAY                  = 9,                                    /*消息延时超时*/
+    UCOM_RET_SUCC                       = VOS_OK,                               /*????*/
+    UCOM_RET_FAIL                       = VOS_ERR,                              /*????*/
+    UCOM_RET_NUL_PTR                    = 2,                                    /*??????*/
+    UCOM_RET_ERR_PARA                   = 3,                                    /*????????*/
+    UCOM_RET_ERR_STATE                  = 4,                                    /*????????*/
+    UCOM_RET_ERR_MSG                    = 5,                                    /*????????*/
+    UCOM_RET_ERR_NOMEM                  = 6,                                    /*????????*/
+    UCOM_RET_FUNC_DISABLE               = 7,                                    /*??????????*/
+    UCOM_RET_SEND_FAIL                  = 8,                                    /*????????????*/
+    UCOM_RET_MSG_DELAY                  = 9,                                    /*????????????*/
     UCOM_RET_BUTT
 };
 typedef VOS_UINT16 UCOM_RET_ENUM_UINT16;
 
-/* 开关量枚举 */
+/* ?????????? */
 enum CODEC_SWITCH_ENUM
 {
     CODEC_SWITCH_OFF                      = 0,
@@ -123,17 +123,17 @@ enum CODEC_SWITCH_ENUM
 };
 typedef VOS_UINT16  CODEC_SWITCH_ENUM_UINT16;
 
-/* 输入输出枚举 */
+/* ???????????? */
 enum CODEC_INOUT_ENUM
 {
     CODEC_INOUT_DEFAULT                   = 0,                                    /* default:TxIn=SIO;TxOut=UL;RxIn=DL;RxOut=SIO */
-    CODEC_INOUT_SOUND,                                                            /* SOUND合成, reserve */
-    CODEC_INOUT_DATA,                                                             /* 数据接口, reserve  */
+    CODEC_INOUT_SOUND,                                                            /* SOUND????, reserve */
+    CODEC_INOUT_DATA,                                                             /* ????????, reserve  */
     CODEC_INOUT_BUTT
 };
 typedef VOS_UINT16  CODEC_INOUT_ENUM_UINT16;
 
-/* 网络制式枚举 */
+/* ???????????? */
 enum CODEC_NET_MODE_ENUM
 {
 	CODEC_NET_MODE_G			= VCVOICE_NET_MODE_GSM,               /* G net mode */
@@ -146,7 +146,7 @@ enum CODEC_NET_MODE_ENUM
 };
 typedef VOS_UINT16  CODEC_NET_MODE_ENUM_UINT16;
 
-/* 声码器类型枚举 */
+/* ?????????????? */
 enum CODEC_ENUM
 {
     CODEC_AMR                       = VCVOICE_TYPE_AMR,
@@ -162,7 +162,7 @@ enum CODEC_ENUM
 };
 typedef VOS_UINT16  CODEC_ENUM_UINT16;
 
-/* AMR速率模式 */
+/* AMR???????? */
 enum CODEC_AMR_RATE_MODE_ENUM
 {
     CODEC_AMR_RATE_MODE_475K              = 0,
@@ -178,119 +178,119 @@ enum CODEC_AMR_RATE_MODE_ENUM
 typedef VOS_UINT16  CODEC_AMR_RATE_MODE_ENUM_UINT16;
 
 /*****************************************************************************
- 实体名称  : CODEC_DTX_ENUM
- 功能描述  : DTX取值定义
+ ????????  : CODEC_DTX_ENUM
+ ????????  : DTX????????
 *****************************************************************************/
 enum CODEC_DTX_ENUM
 {
-    CODEC_DTX_DISABLE               = 0,                                    /* DTX不使能 */
-    CODEC_DTX_ENABLE                = 1,                                    /* DTX使能   */
+    CODEC_DTX_DISABLE               = 0,                                    /* DTX?????? */
+    CODEC_DTX_ENABLE                = 1,                                    /* DTX????   */
     CODEC_DTX_BUTT
 };
 typedef VOS_UINT16 CODEC_DTX_ENUM_UINT16;
 
 /*****************************************************************************
- 实体名称  : CODEC_DTXSTATE_ENUM
- 功能描述  : DTX_STATE取值定义
+ ????????  : CODEC_DTXSTATE_ENUM
+ ????????  : DTX_STATE????????
 *****************************************************************************/
 enum CODEC_DTX_STATE_ENUM
 {
-    CODEC_DTX_NO                    = 0,                                    /* speech态 */
-    CODEC_DTX_YES                   = 1,                                    /* dtx态 */
+    CODEC_DTX_NO                    = 0,                                    /* speech?? */
+    CODEC_DTX_YES                   = 1,                                    /* dtx?? */
     CODEC_DTX_STATE_BUTT
 };
 typedef VOS_UINT16 CODEC_DTX_STATE_ENUM_UINT16;
 
 
 /*****************************************************************************
- 实体名称  : CODEC_VAD_ENUM
- 功能描述  : EFR,HR,FR VAD flag取值定义, 参见3GPP TS 46.081
+ ????????  : CODEC_VAD_ENUM
+ ????????  : EFR,HR,FR VAD flag????????, ????3GPP TS 46.081
 *****************************************************************************/
 enum CODEC_VAD_ENUM
 {
-    CODEC_VAD_SILENCE               = 0,                                    /* 检测为静音 */
-    CODEC_VAD_SPEECH                = 1,                                    /* 检测为语音 */
+    CODEC_VAD_SILENCE               = 0,                                    /* ?????????? */
+    CODEC_VAD_SPEECH                = 1,                                    /* ?????????? */
     CODEC_VAD_BUTT
 };
 typedef VOS_UINT16 CODEC_VAD_ENUM_UINT16;
 
 /*****************************************************************************
- 实体名称  : CODEC_SP_ENUM
- 功能描述  : EFR,HR,FR SP flag取值定义, 参见3GPP TS 46.081
+ ????????  : CODEC_SP_ENUM
+ ????????  : EFR,HR,FR SP flag????????, ????3GPP TS 46.081
 *****************************************************************************/
 enum CODEC_SP_ENUM
 {
-    CODEC_SP_SID                    = 0,                                    /* 输出SID帧    */
-    CODEC_SP_SPEECH                 = 1,                                    /* 输出SPEECH帧 */
+    CODEC_SP_SID                    = 0,                                    /* ????SID??    */
+    CODEC_SP_SPEECH                 = 1,                                    /* ????SPEECH?? */
     CODEC_SP_BUTT
 };
 typedef VOS_UINT16 CODEC_SP_ENUM_UINT16;
 
 /*****************************************************************************
- 实体名称  : CODEC_BFI_ENUM
- 功能描述  : EFR,HR,FR 坏帧标志bfi,ufi取值定义, 参见3GPP TS 46.081, 46.041
+ ????????  : CODEC_BFI_ENUM
+ ????????  : EFR,HR,FR ????????bfi,ufi????????, ????3GPP TS 46.081, 46.041
 *****************************************************************************/
 enum CODEC_BFI_ENUM
 {
-    CODEC_BFI_NO                    = 0,                                    /* 好帧 */
-    CODEC_BFI_YES                   = 1,                                    /* 坏帧 */
+    CODEC_BFI_NO                    = 0,                                    /* ???? */
+    CODEC_BFI_YES                   = 1,                                    /* ???? */
     CODEC_BFI_BUTT
 };
 typedef VOS_UINT16 CODEC_BFI_ENUM_UINT16;
 
 /*****************************************************************************
- 实体名称  : CODEC_SID_ENUM
- 功能描述  : EFR,HR,FR SID flag取值定义, 参见3GPP TS 46.041
+ ????????  : CODEC_SID_ENUM
+ ????????  : EFR,HR,FR SID flag????????, ????3GPP TS 46.041
 *****************************************************************************/
 enum CODEC_SID_ENUM
 {
-    CODEC_SID_SPEECH                = 0,                                    /* 语音帧        */
-    CODEC_SID_ACCEPT                = 1,                                    /* 可接受的SID帧 */
-    CODEC_SID_VALID                 = 2,                                    /* 合法的SID帧   */
+    CODEC_SID_SPEECH                = 0,                                    /* ??????        */
+    CODEC_SID_ACCEPT                = 1,                                    /* ????????SID?? */
+    CODEC_SID_VALID                 = 2,                                    /* ??????SID??   */
     CODEC_SID_BUTT
 };
 typedef VOS_UINT16 CODEC_SID_ENUM_UINT16;
 
 /*****************************************************************************
- 实体名称  : CODEC_TAF_ENUM
- 功能描述  : EFR,HR,FR TAF取值定义, 参见3GPP TS 46.081, 46.041
+ ????????  : CODEC_TAF_ENUM
+ ????????  : EFR,HR,FR TAF????????, ????3GPP TS 46.081, 46.041
 *****************************************************************************/
 enum CODEC_TAF_ENUM
 {
-    CODEC_TAF_NONE                  = 0,                                    /* 非时间对齐 */
-    CODEC_TAF_ALIGNED               = 1,                                    /* 时间对齐, 应该接收到SID */
+    CODEC_TAF_NONE                  = 0,                                    /* ?????????? */
+    CODEC_TAF_ALIGNED               = 1,                                    /* ????????, ??????????SID */
     CODEC_TAF_BUTT
 };
 typedef VOS_UINT16 CODEC_TAF_ENUM_UINT16;
 
 /*****************************************************************************
- 实体名称  : CODEC_HR_UFI_ENUM
- 功能描述  : HR UFI取值定义, 0-信道稳定, 1-信道不好
+ ????????  : CODEC_HR_UFI_ENUM
+ ????????  : HR UFI????????, 0-????????, 1-????????
 *****************************************************************************/
 enum CODEC_HR_UFI_ENUM
 {
-    CODEC_HR_UFI_GOOD               = 0,                                    /* 信道稳定 */
-    CODEC_HR_UFI_BAD                = 1,                                    /* 信道不好 */
+    CODEC_HR_UFI_GOOD               = 0,                                    /* ???????? */
+    CODEC_HR_UFI_BAD                = 1,                                    /* ???????? */
     CODEC_HR_UFI_BUTT
 };
 typedef VOS_UINT16 CODEC_HR_UFI_ENUM_UINT16;
 
 /*****************************************************************************
- 实体名称  : CODEC_AMR_FORMAT_ENUM
- 功能描述  : AMR码流格式定义, 参见3GPP TS 26.101
+ ????????  : CODEC_AMR_FORMAT_ENUM
+ ????????  : AMR????????????, ????3GPP TS 26.101
 *****************************************************************************/
 enum CODEC_AMR_FORMAT_ENUM
 {
-    CODEC_AMR_FORMAT_IF1              = 0,                                      /* IF1码流格式,UMTS下使用 */
-    CODEC_AMR_FORMAT_BITS             = 1,                                      /* GSM-AMR码流格式 */
-    CODEC_AMR_FORMAT_IMS              = 2,                                      /* IMS码流格式 */
+    CODEC_AMR_FORMAT_IF1              = 0,                                      /* IF1????????,UMTS?????? */
+    CODEC_AMR_FORMAT_BITS             = 1,                                      /* GSM-AMR???????? */
+    CODEC_AMR_FORMAT_IMS              = 2,                                      /* IMS???????? */
     CODEC_AMR_FORMAT_BUTT
 };
 typedef VOS_UINT16 CODEC_AMR_FORMAT_ENUM_UINT16;
 
 /*****************************************************************************
- 实体名称  : CODEC_AMR_FRM_TYPE_ENUM
- 功能描述  : AMR IF帧类型, 参见3GPP TS 26.101 Table 1a
+ ????????  : CODEC_AMR_FRM_TYPE_ENUM
+ ????????  : AMR IF??????, ????3GPP TS 26.101 Table 1a
 *****************************************************************************/
 enum CODEC_AMR_FRM_TYPE_ENUM
 {
@@ -312,8 +312,8 @@ enum CODEC_AMR_FRM_TYPE_ENUM
 typedef VOS_UINT16 CODEC_AMR_FRM_TYPE_ENUM_UINT16;
 
 /*****************************************************************************
- 实体名称  : CODEC_AMR_TYPE_RX_ENUM
- 功能描述  : AMR接收帧类型定义, 参见3GPP TS 26.093及26.073 frame.h
+ ????????  : CODEC_AMR_TYPE_RX_ENUM
+ ????????  : AMR??????????????, ????3GPP TS 26.093??26.073 frame.h
 *****************************************************************************/
 enum CODEC_AMR_TYPE_RX_ENUM
 {
@@ -330,8 +330,8 @@ enum CODEC_AMR_TYPE_RX_ENUM
 typedef VOS_UINT16 CODEC_AMR_TYPE_RX_ENUM_UINT16;
 
 /*****************************************************************************
- 实体名称  : CODEC_AMR_TYPE_TX_ENUM
- 功能描述  : AMR发送帧类型定义, 参见3GPP TS 26.093及26.073 frame.h
+ ????????  : CODEC_AMR_TYPE_TX_ENUM
+ ????????  : AMR??????????????, ????3GPP TS 26.093??26.073 frame.h
 *****************************************************************************/
 enum CODEC_AMR_TYPE_TX_ENUM
 {
@@ -348,20 +348,20 @@ enum CODEC_AMR_TYPE_TX_ENUM
 typedef VOS_UINT16 CODEC_AMR_TYPE_TX_ENUM_UINT16;
 
 /*****************************************************************************
- 实体名称  : CODEC_AMR_NSYNC_ENUM
- 功能描述  : AMR NSYNC参数定义, 该参数DTX使能时使用, 参见3GPP TS 26.093 A5.1
+ ????????  : CODEC_AMR_NSYNC_ENUM
+ ????????  : AMR NSYNC????????, ??????DTX??????????, ????3GPP TS 26.093 A5.1
 *****************************************************************************/
 enum CODEC_AMR_NSYNC_ENUM
 {
-    CODEC_AMR_NSYNC_INIT            = 0,                                    /* 初始化值 */
-    CODEC_AMR_NSYNC_HANDOVER        = 12,                                   /* 当发生小区切换时Tx RSS发送给Tx DTX handler */
+    CODEC_AMR_NSYNC_INIT            = 0,                                    /* ???????? */
+    CODEC_AMR_NSYNC_HANDOVER        = 12,                                   /* ????????????????Tx RSS??????Tx DTX handler */
     CODEC_AMR_NSYNC_BUTT
 };
 typedef VOS_UINT16 CODEC_AMR_NSYNC_ENUM_UINT16;
 
 /*****************************************************************************
- 实体名称  : CODEC_AMR_FQI_QUALITY_ENUM
- 功能描述  : 与W物理层约定的AMR帧类型的好坏
+ ????????  : CODEC_AMR_FQI_QUALITY_ENUM
+ ????????  : ??W????????????AMR????????????
 *****************************************************************************/
 enum CODEC_AMR_FQI_QUALITY_ENUM
 {
@@ -372,8 +372,8 @@ enum CODEC_AMR_FQI_QUALITY_ENUM
 typedef VOS_UINT16 CODEC_AMR_FQI_QUALITY_ENUM_UINT16;
 
 /*****************************************************************************
- 实体名称  : CODEC_AMR_STI_SID_ENUM
- 功能描述  : SID标志，0表示SID_FIRST，1表示SID_UPDATE
+ ????????  : CODEC_AMR_STI_SID_ENUM
+ ????????  : SID??????0????SID_FIRST??1????SID_UPDATE
 *****************************************************************************/
 enum CODEC_AMR_STI_SID_ENUM
 {
@@ -384,8 +384,8 @@ enum CODEC_AMR_STI_SID_ENUM
 typedef VOS_UINT16 CODEC_AMR_STI_SID_ENUM_UINT16;
 
 /*****************************************************************************
- 实体名称  : CODEC_AMRWB_RATE_MODE_ENUM_UINT16
- 功能描述  : AMR-WB速率模式
+ ????????  : CODEC_AMRWB_RATE_MODE_ENUM_UINT16
+ ????????  : AMR-WB????????
 *****************************************************************************/
 enum CODEC_AMRWB_RATE_MODE_ENUM
 {
@@ -403,8 +403,8 @@ enum CODEC_AMRWB_RATE_MODE_ENUM
 typedef VOS_UINT16  CODEC_AMRWB_RATE_MODE_ENUM_UINT16;
 
 /*****************************************************************************
- 实体名称  : CODEC_AMRWB_FRM_TYPE_ENUM
- 功能描述  : AMR-WB IF帧类型, 参见3GPP TS 26.201 Table 1a
+ ????????  : CODEC_AMRWB_FRM_TYPE_ENUM
+ ????????  : AMR-WB IF??????, ????3GPP TS 26.201 Table 1a
 *****************************************************************************/
 enum CODEC_AMRWB_FRM_TYPE_ENUM
 {
@@ -424,8 +424,8 @@ enum CODEC_AMRWB_FRM_TYPE_ENUM
 typedef VOS_UINT16 CODEC_AMRWB_FRM_TYPE_ENUM_UINT16;
 
 /*****************************************************************************
- 实体名称  : CODEC_AMRWB_TYPE_RX_ENUM
- 功能描述  : AMR-WB接收帧类型定义, 参见3GPP TS 26.193及26.173 frame.h
+ ????????  : CODEC_AMRWB_TYPE_RX_ENUM
+ ????????  : AMR-WB??????????????, ????3GPP TS 26.193??26.173 frame.h
 *****************************************************************************/
 enum CODEC_AMRWB_TYPE_RX_ENUM
 {
@@ -443,8 +443,8 @@ enum CODEC_AMRWB_TYPE_RX_ENUM
 typedef VOS_UINT16 CODEC_AMRWB_TYPE_RX_ENUM_UINT16;
 
 /*****************************************************************************
- 实体名称  : CODEC_AMRWB_TYPE_TX_ENUM
- 功能描述  : AMR-WB发送帧类型定义, 参见3GPP TS 26.193及26.173 frame.h
+ ????????  : CODEC_AMRWB_TYPE_TX_ENUM
+ ????????  : AMR-WB??????????????, ????3GPP TS 26.193??26.173 frame.h
 *****************************************************************************/
 enum CODEC_AMRWB_TYPE_TX_ENUM
 {
@@ -463,8 +463,8 @@ typedef VOS_UINT16 CODEC_AMRWB_TYPE_TX_ENUM_UINT16;
 
 
 /*****************************************************************************
- 实体名称  : MED_CODEC_FRAME_FACCH_ENUM
- 功能描述  : 下行是否偷帧标志
+ ????????  : MED_CODEC_FRAME_FACCH_ENUM
+ ????????  : ????????????????
 *****************************************************************************/
 enum CODEC_FRAME_FACCH_ENUM
 {
@@ -474,21 +474,21 @@ enum CODEC_FRAME_FACCH_ENUM
 };
 typedef VOS_UINT16 CODEC_FRAME_FACCH_ENUM_UINT16;
 
-/*音频录音模式*/
+/*????????????*/
 enum AUDIO_CAPTURE_MODE_ENUM
 {
-    AUDIO_CAPTURE_MODE_DISABLE = 0,                              /*录音禁止*/
-    AUDIO_CAPTURE_MODE_CALL    = 1,                              /*普通CS通话录音*/
-    AUDIO_CAPTURE_MODE_CAMCORD = 2,                              /*通话时摄像*/
-    AUDIO_CAPTURE_MODE_EXT_CALL= 3,                              /*第三方Modem通话录音*/
-    AUDIO_CAPTURE_MODE_AUDIO   = 4,                              /*普通音频录音*/
-    AUDIO_CAPTURE_MODE_FM      = 5,                              /*普通FM录音*/
-    AUDIO_CAPTURE_MODE_VQM     = 6,                              /*在线语音质量检测*/
+    AUDIO_CAPTURE_MODE_DISABLE = 0,                              /*????????*/
+    AUDIO_CAPTURE_MODE_CALL    = 1,                              /*????CS????????*/
+    AUDIO_CAPTURE_MODE_CAMCORD = 2,                              /*??????????*/
+    AUDIO_CAPTURE_MODE_EXT_CALL= 3,                              /*??????Modem????????*/
+    AUDIO_CAPTURE_MODE_AUDIO   = 4,                              /*????????????*/
+    AUDIO_CAPTURE_MODE_FM      = 5,                              /*????FM????*/
+    AUDIO_CAPTURE_MODE_VQM     = 6,                              /*????????????????*/
     AUDIO_CAPTURE_MODE_BUT
 };
 typedef VOS_UINT16  AUDIO_CAPTURE_MODE_ENUM_UINT16;
 
-/* 音频数据通路状态枚举 */
+/* ???????????????????? */
 enum AUDIO_PCM_STATUS_ENUM
 {
     AUDIO_PCM_STATUS_DEACTIVE= 0,
@@ -498,35 +498,35 @@ enum AUDIO_PCM_STATUS_ENUM
 typedef VOS_UINT16  AUDIO_PCM_STATUS_ENUM_UINT16;
 
 /*****************************************************************************
-  4 消息头定义
+  4 ??????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  5 消息定义
+  5 ????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  6 STRUCT定义
+  6 STRUCT????
 *****************************************************************************/
 /*****************************************************************************
- 结构名    : MSG_CODEC_CNF_STRU
- 协议表格  :
- ASN.1描述 :
- 结构说明  : 命令执行response通用结构体
+ ??????    : MSG_CODEC_CNF_STRU
+ ????????  :
+ ASN.1???? :
+ ????????  : ????????response??????????
 *****************************************************************************/
 typedef struct
 {
-    VOS_UINT16                          usMsgName;                              /* 原语类型 */ /*_H2ASN_Skip*/
-    VOS_UINT16                          usReserve1;                             /* 保留 */
-    UCOM_RET_ENUM_UINT16                enExeRslt;                              /* 执行结果 */
+    VOS_UINT16                          usMsgName;                              /* ???????? */ /*_H2ASN_Skip*/
+    VOS_UINT16                          usReserve1;                             /* ???? */
+    UCOM_RET_ENUM_UINT16                enExeRslt;                              /* ???????? */
     VOS_UINT16                          usReserve2;
 }MSG_CODEC_CNF_STRU;
 
 /*****************************************************************************
- 实体名称  : VOICE_WPHY_AMR_SERIAL_STRU
- 功能描述  : 与W物理层之间约定的AMR上下行码流格式结构体
+ ????????  : VOICE_WPHY_AMR_SERIAL_STRU
+ ????????  : ??W????????????????AMR????????????????????
 *****************************************************************************/
 typedef struct
 {
@@ -534,22 +534,22 @@ typedef struct
 }VOICE_WPHY_AMR_SERIAL_STRU;
 
 /*****************************************************************************
-  7 UNION定义
+  7 UNION????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  8 OTHERS定义
+  8 OTHERS????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  9 全局变量声明
+  9 ????????????
 *****************************************************************************/
 
 
 /*****************************************************************************
-  10 函数声明
+  10 ????????
 *****************************************************************************/
 
 

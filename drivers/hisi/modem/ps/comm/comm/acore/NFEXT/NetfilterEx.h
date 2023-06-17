@@ -56,7 +56,7 @@ extern "C" {
 #endif
 
 /*****************************************************************************
-  1 其他头文件包含
+  1 ??????????????
 *****************************************************************************/
 #include "v_id.h"
 #include "vos.h"
@@ -71,7 +71,7 @@ extern "C" {
 #include "TtfNvInterface.h"
 
 /*****************************************************************************
-  2 宏定义
+  2 ??????
 *****************************************************************************/
 #ifndef __UT_CENTER__
 #define NF_EXT_MEM_ALLOC(pid, size)                  kmalloc(size, GFP_ATOMIC)
@@ -81,7 +81,7 @@ extern "C" {
 #define NF_EXT_MEM_FREE(pid, p)                      PS_MEM_FREE(pid, p);
 #endif
 
-#define NF_EXT_RING_BUF_SIZE                        (8192)  /*环形buff的大小*/
+#define NF_EXT_RING_BUF_SIZE                        (8192)  /*????buff??????*/
 #define NF_TX_MSG_TASK_STACK_SIZE                   (32768)
 
 #define DBG_ON                                      (1)
@@ -98,16 +98,16 @@ extern "C" {
 
 #define NF_EXT_DEF_LOCAL_HOOK_ON_MASK               (g_stExHookMask.ulLocalHookValue)
 
-/* 网络协议栈流控HOOK MASK开关 */
+/* ??????????????HOOK MASK???? */
 #define NF_EXT_DEF_FLOW_CTRL_HOOK_ON_MASK           (g_stExHookMask.ulFlowCtrlHookValue)
 
 
-#define NF_EXT_RPO_TCP                              (0x6)   /*TCP协议类型标志*/
+#define NF_EXT_RPO_TCP                              (0x6)   /*TCP????????????*/
 #define MAC_HEADER_LENGTH                           (14)
 
 #define NF_EXT_MAX_IP_SIZE                          (1500)
 
-/* netfilter钩子函数掩码 */
+/* netfilter???????????? */
 #define NF_EXT_BR_PRE_ROUTING_HOOK_ON_MASK          (1)
 #define NF_EXT_BR_POST_ROUTING_HOOK_ON_MASK         (1 << 1)
 #define NF_EXT_BR_FORWARD_HOOK_ON_MASK              (1 << 2)
@@ -135,12 +135,12 @@ extern "C" {
 #endif
 
 /*******************************************************************************
-  3 枚举定义
+  3 ????????
 *******************************************************************************/
 enum NF_EXT_FLAG_OM_DATA_ENUM
 {
-    NF_EXT_FLAG_OM_DATA                = 0,                    /* OM消息标志 */
-    NF_EXT_FLAG_NOT_OM_DATA            = 1,                    /* 非OM消息标志 */
+    NF_EXT_FLAG_OM_DATA                = 0,                    /* OM???????? */
+    NF_EXT_FLAG_NOT_OM_DATA            = 1,                    /* ??OM???????? */
 
     NF_EXT_FLAG_OM_DATA_BUTT
 };
@@ -148,15 +148,15 @@ typedef int NF_EXT_FLAG_OM_DATA_ENUM_U32;
 
 enum NF_EXT_FLAG_BLOCK_ENUM
 {
-    NF_EXT_FLAG_BLOCKED                = 0,                    /* 阻塞标志 */
-    NF_EXT_FLAG_UNBLOCKED              = 1,                    /* 非阻塞标志 */
+    NF_EXT_FLAG_BLOCKED                = 0,                    /* ???????? */
+    NF_EXT_FLAG_UNBLOCKED              = 1,                    /* ?????????? */
 
     NF_EXT_FLAG_BUTT
 };
 
 enum NF_EXT_TX_BYTES_CNT_ENUM
 {
-    NF_EXT_TX_BYTES_CNT_BR             = 0,                    /* 统计类型 */
+    NF_EXT_TX_BYTES_CNT_BR             = 0,                    /* ???????? */
     NF_EXT_TX_BYTES_CNT_BUTT
 };
 
@@ -175,18 +175,18 @@ enum NF_EXT_STATS_ENUM
 #endif
 
 /*****************************************************************************
-  4 结构定义
+  4 ????????
 *****************************************************************************/
 
 typedef struct
 {
-    VOS_UINT32                      ulIsBlkflag;               /* 阻塞条件 */
-    VOS_UINT32                      ulCurHookOnMask;           /* 当前Hook掩码 */
-    VOS_UINT32                      ulIsDeviceOpen ;           /* 设备是否开启的标志 */
+    VOS_UINT32                      ulIsBlkflag;               /* ???????? */
+    VOS_UINT32                      ulCurHookOnMask;           /* ????Hook???? */
+    VOS_UINT32                      ulIsDeviceOpen ;           /* ?????????????????? */
     VOS_UINT32                      ulOmIp;
-    OM_RING_ID                      pRingBufferId;             /* 环形buff*/
-    wait_queue_head_t               stWaitHeadTxTask;          /* 等待队列头，自处理任务使用 */
-    spinlock_t                      stLockTxTask;              /* 自旋锁，用于环形buff操作的互斥保护 */
+    OM_RING_ID                      pRingBufferId;             /* ????buff*/
+    wait_queue_head_t               stWaitHeadTxTask;          /* ?????????????????????????? */
+    spinlock_t                      stLockTxTask;              /* ????????????????buff?????????????? */
     VOS_UINT8                       aucRsv2[4];
 }NF_EXT_ENTITY_STRU;
 
@@ -199,9 +199,9 @@ typedef struct
 
 #if (FEATURE_ON == FEATURE_NFEXT)
 /*********************************************
- 结构体名 :NF_EXT_MASK_OPS_STRU
- 协议表格 :无
- 结构体说明 :勾子开关掩码映射表结构体
+ ???????? :NF_EXT_MASK_OPS_STRU
+ ???????? :??
+ ?????????? :????????????????????????
 *********************************************/
 typedef struct
 {
@@ -219,11 +219,11 @@ typedef struct
 
 typedef struct
 {
-    VOS_UINT32          ulBrArpHookValue;       /* 网桥和ARP钩子函数对应的掩码 */
-    VOS_UINT32          ulInHookValue;          /* IP层PRE_ROUTING钩子函数对应的掩码 */
-    VOS_UINT32          ulOutHookValue;         /* IP层POST_ROUTING钩子函数对应的掩码 */
-    VOS_UINT32          ulFlowCtrlHookValue;    /* 网桥流控钩子函数所对应的掩码 */
-    VOS_UINT32          ulLocalHookValue;       /* IP层LOCAL钩子函数对应的掩码  */
+    VOS_UINT32          ulBrArpHookValue;       /* ??????ARP?????????????????? */
+    VOS_UINT32          ulInHookValue;          /* IP??PRE_ROUTING?????????????????? */
+    VOS_UINT32          ulOutHookValue;         /* IP??POST_ROUTING?????????????????? */
+    VOS_UINT32          ulFlowCtrlHookValue;    /* ???????????????????????????? */
+    VOS_UINT32          ulLocalHookValue;       /* IP??LOCAL??????????????????  */
     VOS_UINT32          ulRsv;
 }NF_EXT_HOOK_MASK_NV_STRU;
 #endif
@@ -236,7 +236,7 @@ typedef struct
 #endif
 
 /*****************************************************************************
-  5 全局变量声明
+  5 ????????????
 *****************************************************************************/
 #if(NF_EXT_DBG == DBG_ON)
 extern NF_EXT_STATS_STRU g_stNfExtStats;
@@ -247,7 +247,7 @@ extern NF_EXT_STATS_STRU g_stNfExtStats;
 #endif
 
 /*****************************************************************************
-  6 函数声明
+  6 ????????
 *****************************************************************************/
 #if (FEATURE_ON == FEATURE_NFEXT)
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))

@@ -121,8 +121,8 @@ enum
 #define NV_FLASH_FILL                        (0xff)    /*mtd write one page,need to fill invality data*/
 
 /*8bit nand,blocksize = 128k*/
-#define NV_BIN_FILE_BLOCK_NUM         32           /*分区最大有4M,32块*/
-#define NV_DLOAD_FILE_BLOCK_NUM       24           /*dload 分区长度3M,块数最多24块*/
+#define NV_BIN_FILE_BLOCK_NUM         32           /*??????????4M,32??*/
+#define NV_DLOAD_FILE_BLOCK_NUM       24           /*dload ????????3M,????????24??*/
 
 struct nv_sec_file_block_info
 {
@@ -145,7 +145,7 @@ struct nv_nand_info_stru
 struct nv_flash_global_ctrl_stru
 {
     struct nv_dload_packet_head_stru nv_dload;  /*data info in dload flag*/
-    STRU_XNV_MAP_FILE_INFO *other_card_info;  /*除卡1 2外的其他卡的NV信息*/
+    STRU_XNV_MAP_FILE_INFO *other_card_info;  /*????1 2????????????NV????*/
     struct nv_file_info_stru  sys_nv;
     struct nv_file_info_stru  bak_sec;
     struct nv_file_info_stru  def_sec;
@@ -211,7 +211,7 @@ s32   nv_rfile_seek(FILE * fp, s32 offset, s32 whence);
 
 extern char g_emmc_area_name[NV_FILE_BUTT][64];
 
-#define NV_IMG_SEC_NAME                NULL /*不使用，不获取*/
+#define NV_IMG_SEC_NAME                NULL /*??????????????*/
 #define NV_BACK_SEC_NAME               g_emmc_area_name[NV_FILE_BACKUP]
 #define NV_DLOAD_SEC_NAME              g_emmc_area_name[NV_FILE_DLOAD]
 #define NV_DEF_SEC_NAME                g_emmc_area_name[NV_FILE_DEFAULT]
@@ -227,7 +227,7 @@ struct nv_emmc_info_stru
 struct nv_emmc_global_ctrl_stru
 {
     struct nv_dload_packet_head_stru nv_dload;  /*data info in dload flag*/
-    STRU_XNV_MAP_FILE_INFO *other_card_info;  /*除卡1 2外的其他卡的NV信息*/
+    STRU_XNV_MAP_FILE_INFO *other_card_info;  /*????1 2????????????NV????*/
     struct nv_file_info_stru  sys_nv; /*img all section info*/
     struct nv_file_info_stru  bak_sec;
     struct nv_file_info_stru  def_sec;

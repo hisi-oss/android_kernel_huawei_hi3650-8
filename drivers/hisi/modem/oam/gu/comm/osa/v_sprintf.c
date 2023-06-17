@@ -75,7 +75,7 @@
 #include "v_IO.h"
 
 /*****************************************************************************
-    协议栈打印打点方式下的.C文件宏定义
+    ??????????????????????.C??????????
 *****************************************************************************/
 /*lint -e767 modify:x51137; review:h59254; cause:print log */
 #define    THIS_FILE_ID        PS_FILE_ID_V_SPRINTF_C
@@ -196,7 +196,7 @@ VOS_INT32 _C_formatter(const VOS_CHAR *format,
             if (!format_flag)
             {
                 *(str+*((VOS_INT32 *)secret_pointer))='\0';
-                /*nr_of_chars计数有错,当\n时,实际是2个字符,nr_of_chars只记了一次*/
+                /*nr_of_chars????????,??\n??,??????2??????,nr_of_chars??????????*/
                 return *((VOS_INT32 *)secret_pointer);
             }
             put_one_char ((VOS_UINT8)format_flag, secret_pointer,str);
@@ -369,7 +369,7 @@ VOS_INT32 _C_formatter(const VOS_CHAR *format,
         case 'X':
         case 'x':
             if (format_flag == 'p')
-            { /* huyong ??? ---- %p和标准的输出不同 */
+            { /* huyong ??? ---- %p???????????????? */
                 if (length)
                 {
                     /*lint -e147 -e586*/

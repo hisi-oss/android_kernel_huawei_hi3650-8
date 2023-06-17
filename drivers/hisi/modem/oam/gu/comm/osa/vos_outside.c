@@ -76,7 +76,7 @@
 
 
 /*****************************************************************************
-    协议栈打印打点方式下的.C文件宏定义
+    ??????????????????????.C??????????
 *****************************************************************************/
 /*lint -e767 modify:x51137; review:h59254; cause:print log */
 #define    THIS_FILE_ID        PS_FILE_ID_VOS_MAIN_C
@@ -119,7 +119,7 @@ VOS_UINT32 VOS_OutsideInit(VOS_VOID)
 
     g_ulVosOutsideStep = 0x00100000;
 
-    if (VOS_OK != SCM_ChannelMemInit())/* 通道内存初始化 */
+    if (VOS_OK != SCM_ChannelMemInit())/* ?????????????? */
     {
         ulResult |= 0x00100000;
     }

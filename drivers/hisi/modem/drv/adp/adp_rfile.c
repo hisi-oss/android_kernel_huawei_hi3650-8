@@ -91,7 +91,7 @@ typedef  struct semaphore       rfile_sem_id;
 #define Rfile_Free(ptr)         kfree(ptr)
 
 
-#define RFILE_TIMEOUT_MAX           (2000)           /* 最长等待2s */
+#define RFILE_TIMEOUT_MAX           (2000)           /* ????????2s */
 
 typedef struct
 {
@@ -277,7 +277,7 @@ int rfile_stdioFpDestroy(RFILE_FILE *fp)
 }
 
 
-/*文件系统接口*/
+/*????????????*/
 void *mdrv_file_open(const char *path, const char *mode)
 {
     int ret;
@@ -291,7 +291,7 @@ void *mdrv_file_open(const char *path, const char *mode)
         return 0;
     }
 
-    /* 将字符串参数转换成整数 */
+    /* ?????????????????????? */
     flags = rfile_getmode(mode, &oflags);
     if(0 == flags)
     {
@@ -536,9 +536,9 @@ struct rfile_dirent_info
 {
     DRV_DIR_S        *phandle;
     RFILE_DIRENT_STRU   *pdirent;
-    int                 len;        /* 总长度 */
-    int                 ptr;        /* 当前偏移 */
-    struct list_head    stlist;     /* 链表节点 */
+    int                 len;        /* ?????? */
+    int                 ptr;        /* ???????? */
+    struct list_head    stlist;     /* ???????? */
 };
 
 struct rfile_adp_ctrl
@@ -934,10 +934,10 @@ int xcopy_sourcedest(const char *source,const char *dest)
 
     ret = bsp_stat((s8*)dest, &d_stat);
 
-    if(ret < 0) /* 目标文件或目录不存在 */
+    if(ret < 0) /* ???????????????????? */
     {
         /* coverity[uninit_use] */
-        if(S_ISDIR(s_stat.mode))    /* 源是目录 */
+        if(S_ISDIR(s_stat.mode))    /* ???????? */
         {
             ret = bsp_mkdir((s8*)dest, 0775);
             if(0 != ret)
@@ -946,7 +946,7 @@ int xcopy_sourcedest(const char *source,const char *dest)
                 return ret;
             }
         }
-        else        /* 源是文件 */
+        else        /* ???????? */
         {
             /* coverity[example_assign] */
             pfile = bsp_open((const s8*)dest, (RFILE_CREAT|RFILE_RDWR), 0664);  /* TODO: mode */
@@ -958,16 +958,16 @@ int xcopy_sourcedest(const char *source,const char *dest)
             }
         }
 
-        /* 递归调用 */
+        /* ???????? */
         xcopy_sourcedest(source, dest);
     }
-    else    /* 目标文件或目录存在 */
+    else    /* ?????????????????? */
     {
         /* coverity[uninit_use] */
-        if(S_ISDIR(s_stat.mode))    /* 源是目录 */
+        if(S_ISDIR(s_stat.mode))    /* ???????? */
         {
             /* coverity[uninit_use] */
-            if(!S_ISDIR(d_stat.mode))   /* 目标不是目录 */
+            if(!S_ISDIR(d_stat.mode))   /* ???????????? */
             {
                 bsp_trace(BSP_LOG_LEVEL_ERROR, BSP_MODU_RFILE, "[%s] src is dir,dest is file.\n", __FUNCTION__);
                 return -1;
@@ -980,7 +980,7 @@ int xcopy_sourcedest(const char *source,const char *dest)
                 return -1;
             }
 
-            pdirent = Rfile_Malloc(RFILE_DIRENT_LEN);  /* 缓存子目录的名称 */
+            pdirent = Rfile_Malloc(RFILE_DIRENT_LEN);  /* ???????????????? */
             if(NULL == pdirent)
             {
                 bsp_trace(BSP_LOG_LEVEL_ERROR, BSP_MODU_RFILE, "[%s] malloc failed.\n", __FUNCTION__);
@@ -1048,7 +1048,7 @@ int xcopy_sourcedest(const char *source,const char *dest)
                         /* coverity[secure_coding] */
                         strcat(psubdir_d, (char*)pstDirent->d_name);
 
-                        /* 递归调用 */
+                        /* ???????? */
                         xcopy_sourcedest(psubdir_s, psubdir_d);
 
                         Rfile_Free(psubdir_s);
@@ -1060,10 +1060,10 @@ int xcopy_sourcedest(const char *source,const char *dest)
 
             Rfile_Free(pdirent);
         }
-        else        /* 源是文件 */
+        else        /* ???????? */
         {
             /* coverity[uninit_use] */
-            if(S_ISDIR(d_stat.mode))   /* 目标是目录 */
+            if(S_ISDIR(d_stat.mode))   /* ?????????? */
             {
                 bsp_trace(BSP_LOG_LEVEL_ERROR, BSP_MODU_RFILE, "[%s] src is file,dest is dir.\n", __FUNCTION__);
                 return -1;
@@ -1120,7 +1120,7 @@ int xdelete_source(const char *source)
     }
 
     /* coverity[uninit_use] */
-    if(S_ISDIR(s_stat.mode))    /* 源是目录 */
+    if(S_ISDIR(s_stat.mode))    /* ???????? */
     {
         dir = bsp_opendir((s8*)source);
         if(dir < 0)
@@ -1129,7 +1129,7 @@ int xdelete_source(const char *source)
             return -1;
         }
 
-        pdirent = Rfile_Malloc(RFILE_DIRENT_LEN);  /* 缓存子目录的名称 */
+        pdirent = Rfile_Malloc(RFILE_DIRENT_LEN);  /* ???????????????? */
         if(NULL == pdirent)
         {
             bsp_trace(BSP_LOG_LEVEL_ERROR, BSP_MODU_RFILE, "[%s] malloc failed.\n", __FUNCTION__);
@@ -1179,7 +1179,7 @@ int xdelete_source(const char *source)
                     /* coverity[secure_coding] */
                     strcat(psubdir_s, (char*)pstDirent->d_name);
 
-                    /* 递归调用 */
+                    /* ???????? */
                     xdelete_source(psubdir_s);
 
                     Rfile_Free(psubdir_s);
@@ -1193,7 +1193,7 @@ int xdelete_source(const char *source)
 
         bsp_rmdir((s8*)source);
     }
-    else        /* 源是文件 */
+    else        /* ???????? */
     {
         bsp_remove((const s8 *)source);
     }

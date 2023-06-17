@@ -75,7 +75,7 @@ DIAG_BBP_PROC_FUN_STRU g_DiagBbpFunc[] = {
 
 /*****************************************************************************
  Function Name	 : diag_DrxSampleGetChnSizeProc
- Description	 : 低功耗数采获取通道大小
+ Description	 : ??????????????????????
  Input			 :VOS_UINT8* pstReq
 				VOS_UINT32 ulCmdSn
  Output 		 : None
@@ -94,7 +94,7 @@ VOS_UINT32 diag_DrxSampleGetChnSizeProc(DIAG_FRAME_INFO_STRU *pData)
     VOS_UINT32 ulLen;
     DIAG_BBP_MSG_A_TRANS_C_STRU *pstInfo;
 
-    /*AP在发送给CP命令时，需要把数采地址空间信息一起发送过去*/
+    /*AP????????CP??????????????????????????????????????????*/
     ulLen = sizeof(DIAG_BBP_MSG_A_TRANS_C_STRU)-VOS_MSG_HEAD_LENGTH + pData->ulMsgLen+sizeof(DIAG_BBP_DS_ADDR_INFO_STRU);
     
     pstInfo = (DIAG_BBP_MSG_A_TRANS_C_STRU*)VOS_AllocMsg(MSP_PID_DIAG_APP_AGENT, ulLen);
@@ -136,7 +136,7 @@ DIAG_ERROR:
 
 /*****************************************************************************
  Function Name   : diag_BbpMsgProc
- Description     : MSP bbp部分消息处理函数
+ Description     : MSP bbp????????????????
  Input           : None
  Output          : None
  Return          : None
@@ -168,13 +168,13 @@ VOS_UINT32 diag_BbpMsgProc(DIAG_FRAME_INFO_STRU *pData)
     }
 
 
-    /* GU的BBP命令采用透传处理机制 */
+    /* GU??BBP???????????????????? */
     if((DIAG_MODE_GSM == pData->stID.mode4b) || (DIAG_MODE_UMTS == pData->stID.mode4b))
     {
         return diag_TransReqProcEntry(pData, &g_stBbpTransHead);
     }
 
-    /*AP在发送给CP命令时，需要把数采地址空间信息一起发送过去*/
+    /*AP????????CP??????????????????????????????????????????*/
     ulLen = sizeof(DIAG_BBP_MSG_A_TRANS_C_STRU)-VOS_MSG_HEAD_LENGTH + pData->ulMsgLen;
     pstInfo = (DIAG_BBP_MSG_A_TRANS_C_STRU*)VOS_AllocMsg(MSP_PID_DIAG_APP_AGENT, ulLen);
     if(VOS_NULL == pstInfo)
@@ -209,7 +209,7 @@ DIAG_ERROR:
 
 /*****************************************************************************
  Function Name   : diag_BbpMsgInit
- Description     : MSP bbp部分初始化
+ Description     : MSP bbp??????????
  Input           : None
  Output          : None
  Return          : None
@@ -221,32 +221,32 @@ VOS_VOID diag_BbpMsgInit(VOS_VOID)
 
     VOS_UINT32 ulRet;
 
-    /* 创建节点保护信号量, Diag Trans Bbp */
+    /* ??????????????????, Diag Trans Bbp */
     ulRet = VOS_SmBCreate("DTB", 1, VOS_SEMA4_FIFO,&g_stBbpTransHead.TransSem);
     if(VOS_OK != ulRet)
     {
         diag_printf("diag_BbpMsgInit VOS_SmBCreate failed.\n");
     }
 
-    /* 初始化请求链表 */
+    /* ?????????????? */
     blist_head_init(&g_stBbpTransHead.TransHead);
 
-    /*注册message消息回调*/
+    /*????message????????*/
     DIAG_MsgProcReg(DIAG_MSG_TYPE_BBP,diag_BbpMsgProc);
     return;
 }
 /*lint -save -e102 -e10 -e2 -e40 -e533 -e31 -e830 -e522 -e718 -e746 -e702 -e565   -e64 -e23 -e63 -e26 -e578 -e132*/
 extern unsigned long simple_strtoul(const char *cp, char **endp, unsigned int base);
 /*****************************************************************************
-* 函 数 名  : socp_logbuffer_sizeparse
+* ?? ?? ??  : socp_logbuffer_sizeparse
 *
-* 功能描述  : 在代码编译阶段将CMD LINE中的BUFFER大小参数解析出来
+* ????????  : ????????????????CMD LINE????BUFFER????????????????
 *
-* 输入参数  : 无
+* ????????  : ??
 *
-* 输出参数  : 无
+* ????????  : ??
 *
-* 返 回 值  : 无
+* ?? ?? ??  : ??
 *****************************************************************************/
 static int __init diag_BbpDrxDdrEnable(char *pucChar)
 {

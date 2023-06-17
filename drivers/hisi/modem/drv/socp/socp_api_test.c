@@ -338,7 +338,7 @@ int mdrv_socp_test_006(void)
         return -1;
     }
 
-    /* ¶ÁÈ¡ÅäÖÃ */
+    /* ???????? */
     cfg = bsp_socp_get_log_cfg();
     if(cfg->logOnFlag == TRUE)
     {

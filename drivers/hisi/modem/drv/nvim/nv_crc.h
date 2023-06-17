@@ -64,7 +64,7 @@ extern "C" {
 #define NV_RESUME_BAKUP            (0x2)
 #define NV_RESUME_DEFAULT          (0x4)
 
-/*是否进行CRC校验标志*/
+/*????????CRC????????*/
 #define NV_DATA4K_CRC_CHECK_YES    (((struct nv_ctrl_file_info_stru*)NV_GLOBAL_CTRL_INFO_ADDR)->crc_mark.bits.data_crc)
 #define NV_CTRL_CRC_CHECK_YES      (((struct nv_ctrl_file_info_stru*)NV_GLOBAL_CTRL_INFO_ADDR)->crc_mark.bits.ctrl_crc)
 #define NV_ITEM_CRC_CHECK_YES      (((struct nv_ctrl_file_info_stru*)NV_GLOBAL_CTRL_INFO_ADDR)->crc_mark.bits.item_crc)

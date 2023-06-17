@@ -56,16 +56,16 @@ PERCTRL2_REG g_perctrl2_reg = {0,};
 u32 g_perctrl_reg_val = 0;
 
 /*****************************************************************************
-* 函 数 名  : dump_perctrl2_memmap
-* 功能描述  : 映射perctrl2寄存器
+* ?? ?? ??  : dump_perctrl2_memmap
+* ????????  : ????perctrl2??????
 *
-* 输入参数  :            
-* 输出参数  : 
+* ????????  :            
+* ????????  : 
 
-* 返 回 值  : 
+* ?? ?? ??  : 
               
 *
-* 修改记录  : 2016年1月4日17:05:33   lixiaofan  creat
+* ????????  : 2016??1??4??17:05:33   lixiaofan  creat
 *
 *****************************************************************************/
 s32 dump_perctrl2_memmap(void)
@@ -117,16 +117,16 @@ s32 dump_perctrl2_memmap(void)
 
 }
 /*****************************************************************************
-* 函 数 名  : dump_get_perctrl2_status
-* 功能描述  : 查询perctrl2寄存器状态
+* ?? ?? ??  : dump_get_perctrl2_status
+* ????????  : ????perctrl2??????????
 *
-* 输入参数  :            
-* 输出参数  : 
+* ????????  :            
+* ????????  : 
 
-* 返 回 值  : 
+* ?? ?? ??  : 
               
 *
-* 修改记录  : 2016年1月4日17:05:33   lixiaofan  creat
+* ????????  : 2016??1??4??17:05:33   lixiaofan  creat
 *
 *****************************************************************************/
 s32 dump_get_perctrl2_status(void)
@@ -172,16 +172,16 @@ s32 dump_get_perctrl2_status(void)
 }
 
 /*****************************************************************************
-* 函 数 名  : dump_modem_sysctrl_memmap
-* 功能描述  : 映射邋sys_ctrl寄存器
+* ?? ?? ??  : dump_modem_sysctrl_memmap
+* ????????  : ??????sys_ctrl??????
 *
-* 输入参数  :            
-* 输出参数  : 
+* ????????  :            
+* ????????  : 
 
-* 返 回 值  : 
+* ?? ?? ??  : 
               
 *
-* 修改记录  : 2016年1月4日17:05:33   lixiaofan  creat
+* ????????  : 2016??1??4??17:05:33   lixiaofan  creat
 *
 *****************************************************************************/
 s32 dump_modem_sysctrl_memmap(void)
@@ -251,16 +251,16 @@ s32 dump_modem_sysctrl_memmap(void)
 }
 
 /*****************************************************************************
-* 函 数 名  : dump_get_sysctrl_status
-* 功能描述  : 查询modem系统控制器状态
+* ?? ?? ??  : dump_get_sysctrl_status
+* ????????  : ????modem??????????????
 *
-* 输入参数  :            
-* 输出参数  : 
+* ????????  :            
+* ????????  : 
 
-* 返 回 值  : 
+* ?? ?? ??  : 
               
 *
-* 修改记录  : 2016年1月4日17:05:33   lixiaofan  creat
+* ????????  : 2016??1??4??17:05:33   lixiaofan  creat
 *
 *****************************************************************************/
 s32 dump_get_sysctrl_status(void)
@@ -315,16 +315,16 @@ s32 dump_get_sysctrl_status(void)
 }
 
 /*****************************************************************************
-* 函 数 名  : dump_coresight_memmap
-* 功能描述  : 映射modem cp 的etb以及相关控制寄存器地址
+* ?? ?? ??  : dump_coresight_memmap
+* ????????  : ????modem cp ??etb??????????????????????
 *
-* 输入参数  :            
-* 输出参数  : 
+* ????????  :            
+* ????????  : 
 
-* 返 回 值  : 
+* ?? ?? ??  : 
               
 *
-* 修改记录  : 2016年1月4日17:05:33   lixiaofan  creat
+* ????????  : 2016??1??4??17:05:33   lixiaofan  creat
 *
 *****************************************************************************/
 s32 dump_coresight_memmap(void)
@@ -376,16 +376,16 @@ s32 dump_coresight_memmap(void)
 }
 
 /*****************************************************************************
-* 函 数 名  : dump_stop_etm
-* 功能描述  : 停止modem 的etm
+* ?? ?? ??  : dump_stop_etm
+* ????????  : ????modem ??etm
 *
-* 输入参数  :            
-* 输出参数  : 
+* ????????  :            
+* ????????  : 
 
-* 返 回 值  : 
+* ?? ?? ??  : 
               
 *
-* 修改记录  : 2016年1月4日17:05:33   lixiaofan  creat
+* ????????  : 2016??1??4??17:05:33   lixiaofan  creat
 *
 *****************************************************************************/
 void dump_stop_etm(void)
@@ -429,16 +429,16 @@ void dump_stop_etm(void)
 
 }
 /*****************************************************************************
-* 函 数 名  : dump_cs_etb
-* 功能描述  : 保存etb信息
+* ?? ?? ??  : dump_cs_etb
+* ????????  : ????etb????
 *
-* 输入参数  :            
-* 输出参数  : 
+* ????????  :            
+* ????????  : 
 
-* 返 回 值  : 
+* ?? ?? ??  : 
               
 *
-* 修改记录  : 2016年1月4日17:05:33   lixiaofan  creat
+* ????????  : 2016??1??4??17:05:33   lixiaofan  creat
 *
 *****************************************************************************/
 void dump_cs_etb(WDT_CORE_ID core_id)
@@ -480,13 +480,13 @@ void dump_cs_etb(WDT_CORE_ID core_id)
         return;
     }
 
-    /*先停止etm*/
+    /*??????etm*/
     dump_stop_etm();
 
-    /* unlock etb, 配置ETF_LOCK_ACCESS */
+    /* unlock etb, ????ETF_LOCK_ACCESS */
     writel(0xC5ACCE55, tmcRegAddr + 0xFB0);
 
-    /* stop etb, 配置ETF_FORMAT_FLUSH_CTRL */
+    /* stop etb, ????ETF_FORMAT_FLUSH_CTRL */
     reg_value = readl(tmcRegAddr + 0x304);
     /* FFCR StopOnFl */
     reg_value |= 1 << 12;
@@ -496,9 +496,9 @@ void dump_cs_etb(WDT_CORE_ID core_id)
 
     for(i=0; i<10000; i++)
     {
-        /* read etb status, 读取ETF_STATUS */
+        /* read etb status, ????ETF_STATUS */
         reg_value = readl(tmcRegAddr + 0x304);
-        /* bit2为TMCReady指示位 */
+        /* bit2??TMCReady?????? */
         if(0 != ((reg_value & (1 << 6)) >> 6))
         {
             break;
@@ -509,12 +509,12 @@ void dump_cs_etb(WDT_CORE_ID core_id)
     {
         dump_fetal("ETF_STATUS register is not ready\n");
     }
-    /* 等待TMCReady */
+    /* ????TMCReady */
     for(i=0; i<10000; i++)
     {
-        /* read etb status, 读取ETF_STATUS */
+        /* read etb status, ????ETF_STATUS */
         reg_value = readl(tmcRegAddr + 0xc);
-        /* bit2为TMCReady指示位 */
+        /* bit2??TMCReady?????? */
         if(0 != (reg_value & 0x4))
         {
             break;
@@ -522,18 +522,18 @@ void dump_cs_etb(WDT_CORE_ID core_id)
         udelay(10);
     }
 
-    /* 超时判断 */
+    /* ???????? */
     if(i >= 10000)
     {
         dump_fetal("save etb time out\n");
     }
 
-    /* 导出etb数据 */
+    /* ????etb???? */
     memset((void *)dst_addr, 0x0, dst_size);
     data = (u32 *)(dst_addr + 8);
     for(i=0; i<(1024*8)/4; i++)
     {
-        /* read etb, 读取ETF_RAM_RD_DATA */
+        /* read etb, ????ETF_RAM_RD_DATA */
         reg_value = readl(tmcRegAddr + 0x10);
         *data = reg_value;
         data++;
@@ -543,12 +543,12 @@ void dump_cs_etb(WDT_CORE_ID core_id)
         }
     }
 
-    /* 0-3字节存放标识码 */
+    /* 0-3?????????????? */
     *((u32 *)dst_addr) = (u32)0x89ABCDEF;
-    /* 4-7个字节存放ETB数据长度 */
+    /* 4-7??????????ETB???????? */
     *((u32 *)dst_addr + 1) = i*4;
 
-    /* lock etb, 配置ETF_LOCK_ACCESS */
+    /* lock etb, ????ETF_LOCK_ACCESS */
     writel(0x1, tmcRegAddr + 0xFB0);
 
     dump_fetal("the magic has writed 0x%x\n",*((u32 *)dst_addr));

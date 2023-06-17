@@ -75,7 +75,7 @@
 #include "v_IO.h"
 
 /*****************************************************************************
-    协议栈打印打点方式下的.C文件宏定义
+    ??????????????????????.C??????????
 *****************************************************************************/
 /*lint -e767 modify:x51137; review:h59254; cause:print log */
 #define    THIS_FILE_ID        PS_FILE_ID_V_NSPRINTF_C
@@ -117,7 +117,7 @@ VOS_INT32 ANSI_nvsprintf(VOS_CHAR *out_buf, VOS_UINT32 ulStrLen, const VOS_CHAR 
     pucDigs = "0123456789abcdef";
 
 
-    /*lint -e801 -e445 屏蔽goto语句*/
+    /*lint -e801 -e445 ????goto????*/
     for (;; ++pucFmt)
     {
             for (; ((lChar = *pucFmt)!=0) && lChar != '%'; ++pucFmt)
@@ -145,7 +145,7 @@ VOS_INT32 ANSI_nvsprintf(VOS_CHAR *out_buf, VOS_UINT32 ulStrLen, const VOS_CHAR 
 
 rflag: switch (*++pucFmt) {
         case ' ':
-            /* 若空格和加号同时出现，则忽略空格 -- ANSI X3J11  */
+            /* ???????????????????????????????? -- ANSI X3J11  */
             if (!ucPrefixSign)
             {
                 ucPrefixSign = ' ';
@@ -171,7 +171,7 @@ rflag: switch (*++pucFmt) {
         /*lint -e616 */
         case '-':
         /*lint +e616 */
-            lFlags |= LADJUST; /* 左对齐 */
+            lFlags |= LADJUST; /* ?????? */
             /*lint -e801 */
             goto rflag;
             /*lint +e801 */
@@ -363,7 +363,7 @@ rflag: switch (*++pucFmt) {
                 lFlags |= HEXPREFIX;
             }
 
-            /* 无符号数转换 */
+            /* ???????????? */
 nosign:    ucPrefixSign = '\0';
 
 number:     if ((lDprec = lPrec) >= 0)
@@ -382,7 +382,7 @@ number:     if ((lDprec = lPrec) >= 0)
                 pucDigs = "0123456789abcdef";
                 if (lFlags & ALT && lBase == 8 && *pcBuf != '0')
                 {
-                    *--pcBuf = '0'; /* 8进制标志 */
+                    *--pcBuf = '0'; /* 8???????? */
                 }
             }
             lConverSize = ucBuf + BUF - pcBuf;
@@ -530,7 +530,7 @@ pforw:
 
             }
         }
-        /*lint +e801 +e445 屏蔽goto语句*/
+        /*lint +e801 +e445 ????goto????*/
 lvspret:
         if(ulWriteLen--)
         {

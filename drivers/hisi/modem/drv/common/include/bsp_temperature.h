@@ -55,7 +55,7 @@
 #define TEMPERATURE_OK                   0
 #define TEMPERATURE_ERROR                -1
 
-/*ÎÂ¶ÈÄ§»ÃÊý*/
+/*??????????*/
 #define TEMPERATURE_MAGIC_DATA           0x5A5A5A5A
 
 #define  tem_print_error(fmt, ...)    (bsp_trace(BSP_LOG_LEVEL_ERROR,  BSP_MODU_TEMPERATURE, "[tem]: <%s> <%d> "fmt, __FUNCTION__, __LINE__, ##__VA_ARGS__))

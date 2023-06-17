@@ -67,7 +67,7 @@ typedef struct
 typedef struct
 {
     VOS_UINT32 ulTimeId;
-    VOS_UINT32 ulPara;    /* 对应原来的ulParam2*/
+    VOS_UINT32 ulPara;    /* ??????????ulParam2*/
 } OSM_MSG_TIMER_STRU;
 
 
