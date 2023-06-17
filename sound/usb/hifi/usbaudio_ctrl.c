@@ -283,7 +283,7 @@ void usbaudio_ctrl_set_chip(struct snd_usb_audio *chip)
 	mutex_lock(&connect_mutex);
 	if (usbaudio_hifi && chip) {
 		usbaudio_hifi->wake_up = true;
-		if (chip->card && chip->dev->serial && chip->card->shortname && (sizeof(chip->card->shortname) <= 256)){
+                if (chip->card && chip->dev->serial && chip->card->shortname[0] != '\0' && (sizeof(chip->card->shortname) <= 256)) {
 			#ifdef CONFIG_HUAWEI_DSM
 			if (hisi_usb_using_hifi_usb(chip->dev))
 				audio_dsm_report_info(AUDIO_CODEC, DSM_USBAUDIO_INFO, "shortname:%s usbid %x serial %s usbphy %s \n", chip->card->shortname, chip->usb_id, chip->dev->serial, "hifi");
