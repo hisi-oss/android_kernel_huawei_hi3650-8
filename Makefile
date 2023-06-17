@@ -666,6 +666,9 @@ CLANG_FLAGS	+= -no-integrated-as
 KBUILD_CFLAGS	+= $(CLANG_FLAGS)
 KBUILD_AFLAGS	+= $(CLANG_FLAGS)
 export CLANG_FLAGS
+ifneq ($(LLVM),)
+KBUILD_CFLAGS += -fuse-ld=lld
+endif
 endif
 
 # The arch Makefile can set ARCH_{CPP,A,C}FLAGS to override the default
