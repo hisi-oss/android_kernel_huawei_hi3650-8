@@ -211,13 +211,15 @@ static int hisi_pmic_off(void)
 static void pmu0_svdd_sel_on(void)
 {
 	hwlog_info("%s: in\n", __func__);
-	return hisi_pmic_on();
+	hisi_pmic_on();
+        return;
 }
 
 static void pmu0_svdd_sel_off(void)
 {
 	hwlog_info("%s: in\n", __func__);
-	return hisi_pmic_off();
+	hisi_pmic_off();
+        return;
 }
 
 
