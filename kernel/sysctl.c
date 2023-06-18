@@ -64,7 +64,6 @@
 #include <linux/binfmts.h>
 #include <linux/sched/sysctl.h>
 #include <linux/kexec.h>
-#include <linux/boost_sigkill_free.h>
 #include <linux/bpf.h>
 
 #include <linux/mount.h>
@@ -374,15 +373,6 @@ static struct ctl_table kern_table[] = {
 		.proc_handler = proc_dointvec_minmax,
 		.extra1     = &min_migration_delay_granularity,
 		.extra2     = &max_migration_delay_granulartiy,
-	},
-#endif
-#ifdef CONFIG_HW_BOOST_SIGKILL_FREE
-	{
-		.procname	= "boost_sigkill_free",
-		.data		= &sysctl_boost_sigkill_free,
-		.maxlen		= sizeof(int),
-		.mode		= 0644,
-		.proc_handler	= proc_dointvec,
 	},
 #endif
 #ifdef CONFIG_SCHED_DEBUG

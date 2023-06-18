@@ -820,5 +820,3 @@ config HUAWEI_UNMOVABLE_ISOLATE2_SIZE_MBYTES
 	  Defines the size (in MiB) of the default memory area for
 	  MIGRATE_UNMOVABLE_ISOLATE2 Memory Allocator. However,
 	  we should parse the size from /proc/cmdline firstly.
-
-source "mm/hisi/Kconfig"

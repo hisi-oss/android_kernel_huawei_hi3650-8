@@ -53,7 +53,6 @@
 #include <linux/oom.h>
 #include <linux/writeback.h>
 #include <linux/shm.h>
-#include <linux/boost_sigkill_free.h>
 #ifdef CONFIG_KCOV
 #include <linux/kcov.h>
 #endif
@@ -889,9 +888,6 @@ do_group_exit(int exit_code)
 		}
 		spin_unlock_irq(&sighand->siglock);
 	}
-
-	if (sysctl_boost_sigkill_free && sig_kernel_kill(exit_code))
-		fast_free_user_mem();
 
 	do_exit(exit_code);
 	/* NOTREACHED */
