@@ -1,4 +1,4 @@
-/*
+ /*
  * Synopsys DesignWare Multimedia Card Interface driver
  *  (Based on NXP driver for lpc 31xx)
  *
@@ -16,9 +16,19 @@
 
 #include <linux/scatterlist.h>
 #include <linux/mmc/core.h>
-#include <linux/dmaengine.h>
+
+/* austin k3v5 platform dw emmc controller use as wifi usage with id = 0 */
+#ifdef CONFIG_HUAWEI_EMMC_DSM
+#undef CONFIG_HUAWEI_EMMC_DSM
+#endif
+
+#ifdef CONFIG_HUAWEI_EMMC_DSM
+#include <linux/mmc/dsm_emmc.h>
+#endif
 
 #define MAX_MCI_SLOTS	2
+#define TUNING_INIT_CONFIG_NUM 7
+#define TUNING_INIT_TIMING_MODE 10
 
 enum dw_mci_state {
 	STATE_IDLE = 0,
@@ -40,17 +50,6 @@ enum {
 };
 
 struct mmc_data;
-
-enum {
-	TRANS_MODE_PIO = 0,
-	TRANS_MODE_IDMAC,
-	TRANS_MODE_EDMAC
-};
-
-struct dw_mci_dma_slave {
-	struct dma_chan *ch;
-	enum dma_transfer_direction direction;
-};
 
 /**
  * struct dw_mci - MMC controller state shared between all slots
@@ -110,7 +109,6 @@ struct dw_mci_dma_slave {
  * @irq_flags: The flags to be passed to request_irq.
  * @irq: The irq value to be passed to request_irq.
  * @sdio_id0: Number of slot0 in the SDIO interrupt registers.
- * @dto_timer: Timer for broken data transfer over scheme.
  *
  * Locking
  * =======
@@ -142,6 +140,7 @@ struct dw_mci_dma_slave {
  * using barriers.
  */
 struct dw_mci {
+	int wifi_sdio_sdr104_160M;
 	spinlock_t		lock;
 	spinlock_t		irq_lock;
 	void __iomem		*regs;
@@ -157,28 +156,34 @@ struct dw_mci {
 	struct mmc_command	stop_abort;
 	unsigned int		prev_blksz;
 	unsigned char		timing;
+	struct mmc_command	stop;
+	bool			stop_snd;
+
+	struct workqueue_struct	*card_workqueue;
 
 	/* DMA interface members*/
 	int			use_dma;
 	int			using_dma;
+	int			saved_tuning_phase;
+	int			tuning_result_flag;
 	int			dma_64bit_address;
 
 	dma_addr_t		sg_dma;
 	void			*sg_cpu;
 	const struct dw_mci_dma_ops	*dma_ops;
-	/* For idmac */
+#ifdef CONFIG_MMC_DW_IDMAC
 	unsigned int		ring_size;
-
-	/* For edmac */
-	struct dw_mci_dma_slave *dms;
-	/* Registers's physical base address */
-	resource_size_t		phy_regs;
-
+#else
+	struct dw_mci_dma_data	*dma_data;
+#endif
+	unsigned int		desc_sz;
+	u64			dma_mask;		/* custom DMA mask */
 	u32			cmd_status;
 	u32			data_status;
 	u32			stop_cmdr;
 	u32			dir_status;
 	struct tasklet_struct	tasklet;
+	struct work_struct	card_work;
 	unsigned long		pending_events;
 	unsigned long		completed_events;
 	enum dw_mci_state	state;
@@ -189,17 +194,19 @@ struct dw_mci {
 	u32			num_slots;
 	u32			fifoth_val;
 	u16			verid;
+	u16			data_offset;
 	struct device		*dev;
 	struct dw_mci_board	*pdata;
 	const struct dw_mci_drv_data	*drv_data;
 	void			*priv;
 	struct clk		*biu_clk;
 	struct clk		*ciu_clk;
+	struct clk 		*parent_clk;
 	struct dw_mci_slot	*slot[MAX_MCI_SLOTS];
 
 	/* FIFO push and pull */
 	int			fifo_depth;
-	int			data_shift;
+	unsigned int			data_shift;
 	u8			part_buf_start;
 	u8			part_buf_count;
 	union {
@@ -214,22 +221,62 @@ struct dw_mci {
 	u32			quirks;
 
 	bool			vqmmc_enabled;
+	/* S/W reset timer */
+	struct timer_list       timer;
+#ifdef CONFIG_HUAWEI_EMMC_DSM
+	struct timer_list       rw_to_timer;
+	struct work_struct   dmd_work;
+	u32 para;
+	u32			dmd_cmd_status;
+#endif
+
+	/* pinctrl handles */
+	struct pinctrl		*pinctrl;
+	struct pinctrl_state	*pins_default;
+	struct pinctrl_state	*pins_idle;
+
+	struct regulator	*vmmc;	 /* Power regulator */
+	struct regulator	*vqmmc;	 /* Signaling regulator (vccq) */
 	unsigned long		irq_flags; /* IRQ flags */
 	int			irq;
 
+	unsigned int			flags;		/* Host attributes */
+#define DWMMC_IN_TUNING		(1 << 5)	/* Host is doing tuning */
+#define DWMMC_TUNING_DONE	(1 << 6)	/* Host initialization tuning done */
+
+	int						current_div;				/* record current div */
+	int						tuning_current_sample;		/* record current sample */
+	int						tuning_init_sample;			/* record the inital sample */
+	int						tuning_move_sample;			/* record the move sample */
+	int						tuning_move_count;			/* record the move count */
+	unsigned int			tuning_sample_flag;			/* record the sample OK or NOT */
+	int						tuning_move_start;			/* tuning move start flag */
+#define DWMMC_EMMC_ID		0
+#define DWMMC_SD_ID			1
+#define DWMMC_SDIO_ID		2
+	int						hw_mmc_id;					/* Hardware mmc id */
+	int						sd_reinit;
+	int						sd_hw_timeout;
+
+    /*那那??DT??D??? begin*/
+	u32           		    clock;		      /* Current clock (MHz) */
+	u32          		    clock_to_restore; /* Saved clock for dynamic clock gating (MHz) */
+	bool                    tuning_done;
+	bool					tuning_needed;	  /* tuning move start flag */
+    /*那那??DT??D??? end  */
 	int			sdio_id0;
 
 	struct timer_list       cmd11_timer;
-	struct timer_list       dto_timer;
 };
 
 /* DMA ops for Internal/External DMAC interface */
 struct dw_mci_dma_ops {
 	/* DMA Ops */
 	int (*init)(struct dw_mci *host);
-	int (*start)(struct dw_mci *host, unsigned int sg_len);
-	void (*complete)(void *host);
+	void (*start)(struct dw_mci *host, unsigned int sg_len);
+	void (*complete)(struct dw_mci *host);
 	void (*stop)(struct dw_mci *host);
+	void (*reset)(struct dw_mci *host);
 	void (*cleanup)(struct dw_mci *host);
 	void (*exit)(struct dw_mci *host);
 };
@@ -243,8 +290,12 @@ struct dw_mci_dma_ops {
 #define DW_MCI_QUIRK_HIGHSPEED			BIT(2)
 /* Unreliable card detection */
 #define DW_MCI_QUIRK_BROKEN_CARD_DETECTION	BIT(3)
-/* Timer for broken data transfer over scheme */
-#define DW_MCI_QUIRK_BROKEN_DTO			BIT(4)
+/* No write protect */
+#define DW_MCI_QUIRK_NO_WRITE_PROTECT		BIT(4)
+
+/* Slot level quirks */
+/* This slot has no write protect */
+#define DW_MCI_SLOT_QUIRK_NO_WRITE_PROTECT	BIT(0)
 
 struct dma_pdata;
 
@@ -276,8 +327,23 @@ struct dw_mci_board {
 	/* delay in mS before detecting cards after interrupt */
 	u32 detect_delay_ms;
 
+	int (*init)(u32 slot_id, irq_handler_t , void *);
+	int (*get_ro)(u32 slot_id);
+	int (*get_cd)(struct dw_mci *host, u32 slot_id);
+	int (*get_ocr)(u32 slot_id);
+	int (*get_bus_wd)(u32 slot_id);
+	/*
+	 * Enable power to selected slot and set voltage to desired level.
+	 * Voltage levels are specified using MMC_VDD_xxx defines defined
+	 * in linux/mmc/host.h file.
+	 */
+	void (*setpower)(u32 slot_id, u32 volt);
+	void (*exit)(u32 slot_id);
+	void (*select_slot)(u32 slot_id);
+
 	struct dw_mci_dma_ops *dma_ops;
 	struct dma_pdata *data;
+	struct block_settings *blk_settings;
 };
 
 #endif /* LINUX_MMC_DW_MMC_H */

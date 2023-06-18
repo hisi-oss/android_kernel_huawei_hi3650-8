@@ -18,6 +18,9 @@
 #include <linux/notifier.h>
 #include <linux/spinlock.h>
 #include <linux/sysfs.h>
+#ifdef CONFIG_CPU_FREQ_POWER_STAT
+#include <asm/cputime.h>
+#endif
 
 /*********************************************************************
  *                        CPUFREQ INTERFACE                          *
@@ -635,4 +638,17 @@ int cpufreq_generic_init(struct cpufreq_policy *policy,
 struct sched_domain;
 unsigned long cpufreq_scale_freq_capacity(struct sched_domain *sd, int cpu);
 unsigned long cpufreq_scale_max_freq_capacity(int cpu);
+
+#ifdef CONFIG_HISI_EAS_CHECK_LOAD
+unsigned int get_cpu_load(int cpu, u64 now);
+#endif
+
+#ifdef CONFIG_CPU_FREQ_POWER_STAT
+
+/*********************************************************************
+ *                         CPUFREQ STATS                             *
+ *********************************************************************/
+
+void acct_update_power(struct task_struct *p, cputime_t cputime);
+#endif
 #endif /* _LINUX_CPUFREQ_H */

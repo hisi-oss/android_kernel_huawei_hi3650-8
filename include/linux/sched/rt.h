@@ -2,6 +2,7 @@
 #define _SCHED_RT_H
 
 #include <linux/sched/prio.h>
+#include <linux/sched.h>
 
 static inline int rt_prio(int prio)
 {

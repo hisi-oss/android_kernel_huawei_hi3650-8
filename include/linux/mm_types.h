@@ -12,6 +12,7 @@
 #include <linux/cpumask.h>
 #include <linux/uprobes.h>
 #include <linux/page-flags-layout.h>
+#include <linux/workqueue.h>
 #include <asm/page.h>
 #include <asm/mmu.h>
 
@@ -396,6 +397,9 @@ struct mm_rss_stat {
 };
 
 struct kioctx_table;
+#ifdef CONFIG_BLK_DEV_THROTTLING
+struct blk_throtl_io_limit;
+#endif
 struct mm_struct {
 	struct vm_area_struct *mmap;		/* list of VMAs */
 	struct rb_root mm_rb;
@@ -463,6 +467,9 @@ struct mm_struct {
 	spinlock_t			ioctx_lock;
 	struct kioctx_table __rcu	*ioctx_table;
 #endif
+#ifdef CONFIG_BLK_DEV_THROTTLING
+	struct blk_throtl_io_limit	*io_limit;
+#endif
 #ifdef CONFIG_MEMCG
 	/*
 	 * "owner" points to a task that is regarded as the canonical
@@ -476,6 +483,7 @@ struct mm_struct {
 	 */
 	struct task_struct __rcu *owner;
 #endif
+	struct user_namespace *user_ns;
 
 	/* store ref to file /proc/<pid>/exe symlink points to */
 	struct file __rcu *exe_file;
@@ -518,6 +526,10 @@ struct mm_struct {
 #ifdef CONFIG_HUGETLB_PAGE
 	atomic_long_t hugetlb_usage;
 #endif
+#ifdef CONFIG_TASK_PROTECT_LRU
+	int protect;
+#endif
+	struct work_struct async_put_work;
 };
 
 static inline void mm_init_cpumask(struct mm_struct *mm)
