@@ -83,8 +83,6 @@ static int tmio_mmc_next_sg(struct tmio_mmc_host *host)
 	return --host->sg_len;
 }
 
-#define CMDREQ_TIMEOUT	5000
-
 #ifdef CONFIG_MMC_DEBUG
 
 #define STATUS_TO_TEXT(a, status, i) \
@@ -232,7 +230,7 @@ static void tmio_mmc_reset_work(struct work_struct *work)
 	 */
 	if (IS_ERR_OR_NULL(mrq)
 	    || time_is_after_jiffies(host->last_req_ts +
-		msecs_to_jiffies(CMDREQ_TIMEOUT))) {
+		msecs_to_jiffies(2000))) {
 		spin_unlock_irqrestore(&host->lock, flags);
 		return;
 	}
@@ -820,7 +818,7 @@ static void tmio_mmc_request(struct mmc_host *mmc, struct mmc_request *mrq)
 	ret = tmio_mmc_start_command(host, mrq->cmd);
 	if (!ret) {
 		schedule_delayed_work(&host->delayed_reset_work,
-				      msecs_to_jiffies(CMDREQ_TIMEOUT));
+				      msecs_to_jiffies(2000));
 		return;
 	}
 
@@ -1110,8 +1108,7 @@ int tmio_mmc_host_probe(struct tmio_mmc_host *_host,
 	if (ret < 0)
 		goto host_free;
 
-	_host->ctl = devm_ioremap(&pdev->dev,
-				  res_ctl->start, resource_size(res_ctl));
+	_host->ctl = ioremap(res_ctl->start, resource_size(res_ctl));
 	if (!_host->ctl) {
 		ret = -ENOMEM;
 		goto host_free;
@@ -1233,6 +1230,8 @@ void tmio_mmc_host_remove(struct tmio_mmc_host *host)
 
 	pm_runtime_put_sync(&pdev->dev);
 	pm_runtime_disable(&pdev->dev);
+
+	iounmap(host->ctl);
 }
 EXPORT_SYMBOL(tmio_mmc_host_remove);
 

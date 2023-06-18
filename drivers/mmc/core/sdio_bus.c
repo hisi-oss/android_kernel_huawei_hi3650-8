@@ -16,7 +16,10 @@
 #include <linux/export.h>
 #include <linux/slab.h>
 #include <linux/pm_runtime.h>
+#include <linux/version.h>
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
 #include <linux/pm_domain.h>
+#endif
 #include <linux/acpi.h>
 
 #include <linux/mmc/card.h>
@@ -28,13 +31,9 @@
 #include "sdio_cis.h"
 #include "sdio_bus.h"
 
-#ifdef CONFIG_MMC_EMBEDDED_SDIO
-#include <linux/mmc/host.h>
-#endif
-
 #define to_sdio_driver(d)	container_of(d, struct sdio_driver, drv)
-
 /* show configuration fields */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
 #define sdio_config_attr(field, format_string)				\
 static ssize_t								\
 field##_show(struct device *dev, struct device_attribute *attr, char *buf)				\
@@ -45,6 +44,17 @@ field##_show(struct device *dev, struct device_attribute *attr, char *buf)				\
 	return sprintf (buf, format_string, func->field);		\
 }									\
 static DEVICE_ATTR_RO(field)
+#else
+#define sdio_config_attr(field, format_string)				\
+static ssize_t								\
+field##_show(struct device *dev, struct device_attribute *attr, char *buf)				\
+{									\
+	struct sdio_func *func;						\
+									\
+	func = dev_to_sdio_func (dev);					\
+	return sprintf (buf, format_string, func->field);		\
+}
+#endif
 
 sdio_config_attr(class, "0x%02x\n");
 sdio_config_attr(vendor, "0x%04x\n");
@@ -57,6 +67,8 @@ static ssize_t modalias_show(struct device *dev, struct device_attribute *attr, 
 	return sprintf(buf, "sdio:c%02Xv%04Xd%04X\n",
 			func->class, func->vendor, func->device);
 }
+
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
 static DEVICE_ATTR_RO(modalias);
 
 static struct attribute *sdio_dev_attrs[] = {
@@ -67,6 +79,15 @@ static struct attribute *sdio_dev_attrs[] = {
 	NULL,
 };
 ATTRIBUTE_GROUPS(sdio_dev);
+#else
+static struct device_attribute sdio_dev_attrs[] = {
+	__ATTR_RO(class),
+	__ATTR_RO(vendor),
+	__ATTR_RO(device),
+	__ATTR_RO(modalias),
+	__ATTR_NULL,
+};
+#endif
 
 static const struct sdio_device_id *sdio_match_one(struct sdio_func *func,
 	const struct sdio_device_id *id)
@@ -141,10 +162,6 @@ static int sdio_bus_probe(struct device *dev)
 	if (!id)
 		return -ENODEV;
 
-	ret = dev_pm_domain_attach(dev, false);
-	if (ret == -EPROBE_DEFER)
-		return ret;
-
 	/* Unbound SDIO functions are always suspended.
 	 * During probe, the function is set active and the usage count
 	 * is incremented.  If the driver supports runtime PM,
@@ -174,7 +191,6 @@ static int sdio_bus_probe(struct device *dev)
 disable_runtimepm:
 	if (func->card->host->caps & MMC_CAP_POWER_OFF_CARD)
 		pm_runtime_put_noidle(dev);
-	dev_pm_domain_detach(dev, false);
 	return ret;
 }
 
@@ -206,11 +222,10 @@ static int sdio_bus_remove(struct device *dev)
 	if (func->card->host->caps & MMC_CAP_POWER_OFF_CARD)
 		pm_runtime_put_sync(dev);
 
-	dev_pm_domain_detach(dev, false);
-
 	return ret;
 }
 
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
 static const struct dev_pm_ops sdio_bus_pm_ops = {
 	SET_SYSTEM_SLEEP_PM_OPS(pm_generic_suspend, pm_generic_resume)
 	SET_RUNTIME_PM_OPS(
@@ -219,10 +234,23 @@ static const struct dev_pm_ops sdio_bus_pm_ops = {
 		NULL
 	)
 };
-
+#else
+static const struct dev_pm_ops sdio_bus_pm_ops = {
+	SET_SYSTEM_SLEEP_PM_OPS(pm_generic_suspend, pm_generic_resume)
+	SET_RUNTIME_PM_OPS(
+		pm_generic_runtime_suspend,
+		pm_generic_runtime_resume,
+		pm_generic_runtime_idle
+	)
+};
+#endif
 static struct bus_type sdio_bus_type = {
 	.name		= "sdio",
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
 	.dev_groups	= sdio_dev_groups,
+#else
+	.dev_attrs	= sdio_dev_attrs,
+#endif
 	.match		= sdio_bus_match,
 	.uevent		= sdio_bus_uevent,
 	.probe		= sdio_bus_probe,
@@ -308,8 +336,12 @@ static void sdio_acpi_set_handle(struct sdio_func *func)
 {
 	struct mmc_host *host = func->card->host;
 	u64 addr = ((u64)host->slotno << 16) | func->num;
-
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
 	acpi_preset_companion(&func->dev, ACPI_COMPANION(host->parent), addr);
+#else
+	ACPI_HANDLE_SET(&func->dev,
+			acpi_get_child(ACPI_HANDLE(host->parent), addr));
+#endif
 }
 #else
 static inline void sdio_acpi_set_handle(struct sdio_func *func) {}
@@ -334,8 +366,14 @@ int sdio_add_func(struct sdio_func *func)
 	sdio_set_of_node(func);
 	sdio_acpi_set_handle(func);
 	ret = device_add(&func->dev);
-	if (ret == 0)
+	if (ret == 0) {
 		sdio_func_set_present(func);
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
+		dev_pm_domain_attach(&func->dev, false);
+#else
+		acpi_dev_pm_attach(&func->dev, false);
+#endif
+	}
 
 	return ret;
 }
@@ -351,6 +389,13 @@ void sdio_remove_func(struct sdio_func *func)
 	if (!sdio_func_present(func))
 		return;
 
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
+	dev_pm_domain_detach(&func->dev, false);
+#else
+#if ((!defined(CONFIG_ACPI)) || (!defined(CONFIG_PM)))
+	acpi_dev_pm_detach(&func->dev, false);
+#endif
+#endif
 	device_del(&func->dev);
 	of_node_put(func->dev.of_node);
 	put_device(&func->dev);

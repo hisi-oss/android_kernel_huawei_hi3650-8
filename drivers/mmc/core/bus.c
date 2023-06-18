@@ -11,6 +11,7 @@
  *  MMC card bus driver model
  */
 
+#include <linux/version.h>
 #include <linux/export.h>
 #include <linux/device.h>
 #include <linux/err.h>
@@ -26,10 +27,15 @@
 #include "sdio_cis.h"
 #include "bus.h"
 
-#define to_mmc_driver(d)	container_of(d, struct mmc_driver, drv)
+#define to_mmc_driver(d)       container_of(d, struct mmc_driver, drv)
 
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
 static ssize_t type_show(struct device *dev,
 	struct device_attribute *attr, char *buf)
+#else
+static ssize_t mmc_type_show(struct device *dev,
+	struct device_attribute *attr, char *buf)
+#endif
 {
 	struct mmc_card *card = mmc_dev_to_card(dev);
 
@@ -41,11 +47,13 @@ static ssize_t type_show(struct device *dev,
 	case MMC_TYPE_SDIO:
 		return sprintf(buf, "SDIO\n");
 	case MMC_TYPE_SD_COMBO:
+		/*cppcheck-suppress * */
 		return sprintf(buf, "SDcombo\n");
 	default:
 		return -EFAULT;
 	}
 }
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
 static DEVICE_ATTR_RO(type);
 
 static struct attribute *mmc_dev_attrs[] = {
@@ -53,6 +61,12 @@ static struct attribute *mmc_dev_attrs[] = {
 	NULL,
 };
 ATTRIBUTE_GROUPS(mmc_dev);
+#else
+static struct device_attribute mmc_dev_attrs[] = {
+	__ATTR(type, S_IRUGO, mmc_type_show, NULL),
+	__ATTR_NULL,
+};
+#endif
 
 /*
  * This currently matches any MMC driver to any MMC card - drivers
@@ -61,6 +75,14 @@ ATTRIBUTE_GROUPS(mmc_dev);
  */
 static int mmc_bus_match(struct device *dev, struct device_driver *drv)
 {
+#ifdef CONFIG_MMC_PASSWORDS
+	struct mmc_card *card = mmc_dev_to_card(dev);
+	
+	if ((card->type == MMC_TYPE_SD) && mmc_card_locked(card)) {
+		dev_dbg(&card->dev, "sd card is locked; binding is deferred\n");
+		return 0;
+	}
+#endif
 	return 1;
 }
 
@@ -87,6 +109,14 @@ mmc_bus_uevent(struct device *dev, struct kobj_uevent_env *env)
 	default:
 		type = NULL;
 	}
+#ifdef CONFIG_MMC_PASSWORDS
+	if (mmc_card_locked(card)) {
+		printk("[SDLOCK] %s MMC_LOCK=LOCKED", __func__);
+		retval = add_uevent_var(env, "MMC_LOCK=LOCKED");
+		if (retval)
+			return retval;
+	}
+#endif
 
 	if (type) {
 		retval = add_uevent_var(env, "MMC_TYPE=%s", type);
@@ -131,16 +161,30 @@ static void mmc_bus_shutdown(struct device *dev)
 	struct mmc_card *card = mmc_dev_to_card(dev);
 	struct mmc_host *host = card->host;
 	int ret;
+	int present = 1;
 
-	if (dev->driver && drv->shutdown)
+	host->rescan_disable = 1;
+	if(host->ops->get_cd)
+		present = host->ops->get_cd(host);
+
+	if (0 == present)
+		return;
+
+	printk("%s:%d ++\n", __func__, __LINE__);
+	if (dev->driver && drv->shutdown) {
 		drv->shutdown(card);
+	}
 
 	if (host->bus_ops->shutdown) {
 		ret = host->bus_ops->shutdown(host);
-		if (ret)
-			pr_warn("%s: error %d during shutdown\n",
-				mmc_hostname(host), ret);
+		if (ret){
+			pr_err("%s: error during bus shutdown,ret = %d\n",
+					mmc_hostname(host),ret);
+		}
 	}
+	printk("%s:%d --\n", __func__, __LINE__);
+
+	return;
 }
 
 #ifdef CONFIG_PM_SLEEP
@@ -150,11 +194,29 @@ static int mmc_bus_suspend(struct device *dev)
 	struct mmc_host *host = card->host;
 	int ret;
 
+	printk("%s:%d ++\n", __func__, __LINE__);
 	ret = pm_generic_suspend(dev);
-	if (ret)
+	if (ret) {
+		pr_err("%s:%d blk suspend failed ret %d\n", __func__, __LINE__, ret);
 		return ret;
+	}
 
+#ifdef CONFIG_MMC_BLOCK_DEFERRED_RESUME
+	if (mmc_card_sd(card) && mmc_bus_needs_resume(host)) {
+		pr_err("[Deferred_resume] %s:%d--\n", __func__, __LINE__);
+		return 0;
+	}
+#endif
 	ret = host->bus_ops->suspend(host);
+	/*if bus_ops->suspend failed, need to pm_generic_resume*/
+#ifdef CONFIG_HISI_MMC
+	if (ret) {
+		pr_err("%s:%d bus_suspend failed ret=%d\n",
+			__func__, __LINE__, ret);
+		(void)pm_generic_resume(dev);
+	}
+#endif
+	printk("%s:%d %d--\n", __func__, __LINE__, ret);
 	return ret;
 }
 
@@ -164,12 +226,24 @@ static int mmc_bus_resume(struct device *dev)
 	struct mmc_host *host = card->host;
 	int ret;
 
+#ifdef CONFIG_MMC_BLOCK_DEFERRED_RESUME
+	if (mmc_card_sd(card) && mmc_bus_manual_resume(host)) {
+		pr_err("[Deferred_resume] %s:%d ++\n", __func__, __LINE__);
+		host->bus_resume_flags |= MMC_BUSRESUME_NEEDS_RESUME;
+		goto skip_full_resume;
+	}
+#endif
+	printk("%s:%d ++\n", __func__, __LINE__);
 	ret = host->bus_ops->resume(host);
 	if (ret)
 		pr_warn("%s: error %d during resume (card was removed?)\n",
 			mmc_hostname(host), ret);
 
+#ifdef CONFIG_MMC_BLOCK_DEFERRED_RESUME
+skip_full_resume:
+#endif
 	ret = pm_generic_resume(dev);
+	printk("%s:%d %d--\n", __func__, __LINE__, ret);
 	return ret;
 }
 #endif
@@ -199,7 +273,11 @@ static const struct dev_pm_ops mmc_bus_pm_ops = {
 
 static struct bus_type mmc_bus_type = {
 	.name		= "mmc",
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1 , 0))
 	.dev_groups	= mmc_dev_groups,
+#else
+	.dev_attrs	= mmc_dev_attrs,
+#endif
 	.match		= mmc_bus_match,
 	.uevent		= mmc_bus_uevent,
 	.probe		= mmc_bus_probe,
@@ -248,7 +326,8 @@ static void mmc_release_card(struct device *dev)
 
 	sdio_free_common_cis(card);
 
-	kfree(card->info);
+	if (card->info)
+		kfree(card->info);
 
 	kfree(card);
 }
@@ -332,14 +411,14 @@ int mmc_add_card(struct mmc_card *card)
 			mmc_card_ddr52(card) ? "DDR " : "",
 			type);
 	} else {
-		pr_info("%s: new %s%s%s%s%s card at address %04x\n",
+		pr_info("%s: new %s%s%s%s%s card at address %04x,manfid:0x%02x,date:%d/%d\n",
 			mmc_hostname(card->host),
 			mmc_card_uhs(card) ? "ultra high speed " :
 			(mmc_card_hs(card) ? "high speed " : ""),
 			mmc_card_hs400(card) ? "HS400 " :
 			(mmc_card_hs200(card) ? "HS200 " : ""),
 			mmc_card_ddr52(card) ? "DDR " : "",
-			uhs_bus_speed_mode, type, card->rca);
+			uhs_bus_speed_mode, type, card->rca,card->cid.manfid,card->cid.year,card->cid.month);
 	}
 
 #ifdef CONFIG_DEBUG_FS
@@ -352,6 +431,15 @@ int mmc_add_card(struct mmc_card *card)
 	ret = device_add(&card->dev);
 	if (ret)
 		return ret;
+#ifdef CONFIG_MMC_PASSWORDS 
+	if (card->host->bus_ops->sysfs_add) { 
+		ret = card->host->bus_ops->sysfs_add(card->host, card);
+		if (ret) { 
+			device_del(&card->dev);
+			return ret;
+		 }
+	}
+#endif
 
 	mmc_card_set_present(card);
 
@@ -376,6 +464,10 @@ void mmc_remove_card(struct mmc_card *card)
 			pr_info("%s: card %04x removed\n",
 				mmc_hostname(card->host), card->rca);
 		}
+#ifdef CONFIG_MMC_PASSWORDS		
+		if (card->host->bus_ops->sysfs_remove)
+			card->host->bus_ops->sysfs_remove(card->host, card);
+#endif
 		device_del(&card->dev);
 		of_node_put(card->dev.of_node);
 	}

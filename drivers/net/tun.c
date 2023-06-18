@@ -1105,9 +1105,11 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
 	}
 
 	if (tun->flags & IFF_VNET_HDR) {
-		if (len < tun->vnet_hdr_sz)
+		int vnet_hdr_sz = READ_ONCE(tun->vnet_hdr_sz);
+
+		if (len < vnet_hdr_sz)
 			return -EINVAL;
-		len -= tun->vnet_hdr_sz;
+		len -= vnet_hdr_sz;
 
 		n = copy_from_iter(&gso, sizeof(gso), from);
 		if (n != sizeof(gso))
@@ -1119,7 +1121,7 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
 
 		if (tun16_to_cpu(tun, gso.hdr_len) > len)
 			return -EINVAL;
-		iov_iter_advance(from, tun->vnet_hdr_sz - sizeof(gso));
+		iov_iter_advance(from, vnet_hdr_sz - sizeof(gso));
 	}
 
 	if ((tun->flags & TUN_TYPE_MASK) == IFF_TAP) {
@@ -1186,6 +1188,10 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
 			return -EINVAL;
 		}
 	}
+
+	if (!(tun->flags & IFF_NO_PI))
+		if (pi.flags & htons(CHECKSUM_UNNECESSARY))
+			skb->ip_summed = CHECKSUM_UNNECESSARY;
 
 	switch (tun->flags & TUN_TYPE_MASK) {
 	case IFF_TUN:
@@ -1298,7 +1304,7 @@ static ssize_t tun_put_user(struct tun_struct *tun,
 		vlan_hlen = VLAN_HLEN;
 
 	if (tun->flags & IFF_VNET_HDR)
-		vnet_hdr_sz = tun->vnet_hdr_sz;
+		vnet_hdr_sz = READ_ONCE(tun->vnet_hdr_sz);
 
 	total = skb->len + vlan_hlen + vnet_hdr_sz;
 
@@ -2150,9 +2156,9 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
 	}
 
 unlock:
-	rtnl_unlock();
 	if (tun)
 		tun_put(tun);
+	rtnl_unlock();
 	return ret;
 }
 
@@ -2264,11 +2270,10 @@ static void tun_chr_show_fdinfo(struct seq_file *m, struct file *f)
 	tun = tun_get(f);
 	if (tun)
 		tun_get_iff(current->nsproxy->net_ns, tun, &ifr);
-	rtnl_unlock();
 
 	if (tun)
 		tun_put(tun);
-
+	rtnl_unlock();
 	seq_printf(m, "iff:\t%s\n", ifr.ifr_name);
 }
 #endif

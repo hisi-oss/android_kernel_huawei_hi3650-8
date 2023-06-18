@@ -71,6 +71,9 @@ static inline struct dma_async_tx_descriptor *vchan_tx_prep(struct virt_dma_chan
  */
 static inline bool vchan_issue_pending(struct virt_dma_chan *vc)
 {
+	if (vc->chan.dmas_callback) {
+		vc->chan.dmas_callback(vc->chan.dmas_callback_param, 1);
+	}
 	list_splice_tail_init(&vc->desc_submitted, &vc->desc_issued);
 	return !list_empty(&vc->desc_issued);
 }
@@ -92,6 +95,9 @@ static inline void vchan_cookie_complete(struct virt_dma_desc *vd)
 		 vd, cookie);
 	list_add_tail(&vd->node, &vc->desc_completed);
 
+	if (vc->chan.dmas_callback) {
+		vc->chan.dmas_callback(vc->chan.dmas_callback_param, 29);
+	}
 	tasklet_schedule(&vc->task);
 }
 

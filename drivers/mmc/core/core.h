@@ -16,6 +16,8 @@
 #define MMC_CMD_RETRIES        3
 
 struct mmc_bus_ops {
+	int (*awake)(struct mmc_host *);
+	int (*sleep)(struct mmc_host *);
 	void (*remove)(struct mmc_host *);
 	void (*detect)(struct mmc_host *);
 	int (*pre_suspend)(struct mmc_host *);
@@ -28,6 +30,10 @@ struct mmc_bus_ops {
 	int (*alive)(struct mmc_host *);
 	int (*shutdown)(struct mmc_host *);
 	int (*reset)(struct mmc_host *);
+#ifdef CONFIG_MMC_PASSWORDS	
+	int (*sysfs_add)(struct mmc_host *, struct mmc_card *card);
+	void (*sysfs_remove)(struct mmc_host *, struct mmc_card *card);
+#endif	
 };
 
 void mmc_attach_bus(struct mmc_host *host, const struct mmc_bus_ops *ops);
@@ -40,6 +46,9 @@ void mmc_init_erase(struct mmc_card *card);
 
 void mmc_set_chip_select(struct mmc_host *host, int mode);
 void mmc_set_clock(struct mmc_host *host, unsigned int hz);
+void mmc_gate_clock(struct mmc_host *host);
+void mmc_ungate_clock(struct mmc_host *host);
+void mmc_set_ungated(struct mmc_host *host);
 void mmc_set_bus_mode(struct mmc_host *host, unsigned int mode);
 void mmc_set_bus_width(struct mmc_host *host, unsigned int width);
 u32 mmc_select_voltage(struct mmc_host *host, u32 ocr);
@@ -47,12 +56,12 @@ int mmc_set_signal_voltage(struct mmc_host *host, int signal_voltage, u32 ocr);
 int __mmc_set_signal_voltage(struct mmc_host *host, int signal_voltage);
 void mmc_set_timing(struct mmc_host *host, unsigned int timing);
 void mmc_set_driver_type(struct mmc_host *host, unsigned int drv_type);
-int mmc_select_drive_strength(struct mmc_card *card, unsigned int max_dtr,
-			      int card_drv_type, int *drv_type);
 void mmc_power_up(struct mmc_host *host, u32 ocr);
 void mmc_power_off(struct mmc_host *host);
 void mmc_power_cycle(struct mmc_host *host, u32 ocr);
 void mmc_set_initial_state(struct mmc_host *host);
+void mmc_power_up_vcc(struct mmc_host *host,u32 ocr);
+void mmc_power_off_vcc(struct mmc_host *host);
 
 static inline void mmc_delay(unsigned int ms)
 {
@@ -87,8 +96,9 @@ void mmc_remove_card_debugfs(struct mmc_card *card);
 void mmc_init_context_info(struct mmc_host *host);
 
 int mmc_execute_tuning(struct mmc_card *card);
-int mmc_hs200_to_hs400(struct mmc_card *card);
-int mmc_hs400_to_hs200(struct mmc_card *card);
+
+int mmc_sd_init_card(struct mmc_host *host, u32 ocr,
+	struct mmc_card *oldcard);
 
 #endif
 
