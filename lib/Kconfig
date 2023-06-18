@@ -531,4 +531,21 @@ config ARCH_HAS_PMEM_API
 config ARCH_HAS_MMIO_FLUSH
 	bool
 
+config WBT
+	bool "buffered writeback throttling"
+
+config DIRTY_PAGES_CONTROL
+	bool "dirty pages control"
+	default n
+        depends on WBT
+	help
+	  dirty pages writeback in SmartIO sync ways
+
+config WBT_DM_BLK
+	bool "enable dm wbt(blk) for 950 O product"
+	default n
+        depends on WBT
+	help
+	  set wb_mode to blk to support dm for 950 O product
+
 endmenu
