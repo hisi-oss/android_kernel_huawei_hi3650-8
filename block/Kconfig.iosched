@@ -77,16 +77,6 @@ choice
 
 endchoice
 
-config ROW_OPTIMIZATION
-	bool "row optimization"
-	depends on DEFAULT_ROW
-	default y
-	---help---
-		The row optimization parameter controls the module to compile
-		into kernel secbootimage. row optimization is to use the
-		row realtime priority and set the forground process to the
-		realtime priority.
-
 config DEFAULT_IOSCHED
 	string
 	default "deadline" if DEFAULT_DEADLINE

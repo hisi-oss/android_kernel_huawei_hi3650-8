@@ -59,9 +59,6 @@
 #include <linux/delay.h>
 #include <linux/cpuset.h>
 #include <linux/atomic.h>
-#ifdef CONFIG_ROW_OPTIMIZATION
-#include <linux/ioprio.h>
-#endif
 #include <linux/proc_ns.h>
 #include <linux/nsproxy.h>
 #include <linux/file.h>
@@ -4792,52 +4789,6 @@ static int pidlist_array_load(struct cgroup *cgrp, enum cgroup_filetype type,
 	*lp = l;
 	return 0;
 }
-
-#ifdef CONFIG_ROW_OPTIMIZATION
-/* cgroup_update_task_ioprio - set the task ioprio
- * according to the cpuset ioprio
- * @css: cgroup_subsys_state of the cgroup
- * @ioprio: the ioprio to set the tasks
- *
- * mutex_lock the cgroup and then traverse the cgroups tasks
- * then accroding to the ioprio set the ioprio of the task
- */
-int cgroup_update_ioprio(struct cgroup_subsys_state *css, int ioprio)
-{
-	int length;
-	int pid, n = 0;
-	int ret = 0;
-	struct css_task_iter it;
-	struct task_struct *tsk;
-	unsigned int u_ioprio;
-	int ioprio_set;
-
-	if (ioprio < 0 || ioprio > 3)
-		return -EINVAL;
-	u_ioprio = ioprio;
-	ioprio_set = (int)(u_ioprio << IOPRIO_CLASS_SHIFT);
-	/*lint -save -e115*/
-	length = cgroup_task_count(css->cgroup);
-	/*lint restore*/
-	css_task_iter_start(css, &it);
-	while ((tsk = css_task_iter_next(&it))) {
-		if (unlikely(n == length))
-			break;
-		pid = task_pid_vnr(tsk);
-		if (pid > 0) {
-			ret = set_task_ioprio(tsk, ioprio_set);
-			if (ret)
-				pr_warn("row :set tid %d to priority %d failed",
-						tsk->pid, ioprio);
-			n++;
-		}
-	}
-	css_task_iter_end(&it);
-	length = n;
-
-	return length;
-}
-#endif
 
 /**
  * cgroupstats_build - build and fill cgroupstats

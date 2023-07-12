@@ -1006,12 +1006,6 @@ config HW_CGROUP_IONICE
 	  It's useful in mobile devices where certain background apps
 	  are doing heavy io work.
 
-config CGROUP_IOLIMIT
-	bool "IO bandwidth limit cgroup subsystem"
-	help
-	  Provides a cgroup implementing for io bandwidth while a process
-	  in the cgroup read or write.
-
 config CGROUP_DEVICE
 	bool "Device controller for cgroups"
 	help

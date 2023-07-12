@@ -60,10 +60,6 @@ SUBSYS(net_prio)
 SUBSYS(hugetlb)
 #endif
 
-#if IS_ENABLED(CONFIG_CGROUP_IOLIMIT)
-SUBSYS(iolimit)
-#endif
-
 #if IS_ENABLED(CONFIG_CGROUP_PIDS)
 SUBSYS(pids)
 #endif

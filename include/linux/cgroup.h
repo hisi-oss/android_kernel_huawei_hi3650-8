@@ -87,9 +87,6 @@ struct cgroup_subsys_state *css_tryget_online_from_dir(struct dentry *dentry,
 						       struct cgroup_subsys *ss);
 struct cgroup *cgroup_get_from_path(const char *path);
 struct cgroup *cgroup_get_from_fd(int fd);
-#ifdef CONFIG_ROW_OPTIMIZATION
-extern int cgroup_update_ioprio(struct cgroup_subsys_state *css, int ioprio);
-#endif
 int cgroup_attach_task_all(struct task_struct *from, struct task_struct *);
 int cgroup_transfer_tasks(struct cgroup *to, struct cgroup *from);
 
