@@ -82,7 +82,7 @@ static void flush_isr_sync(void)
 static int never_hifi_usb;
 static int always_hifi_usb;
 #else
-#define never_hifi_usb 0
+#define never_hifi_usb 1
 #define always_hifi_usb 0
 #endif
 
