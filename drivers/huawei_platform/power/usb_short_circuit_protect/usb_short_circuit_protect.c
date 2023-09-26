@@ -257,7 +257,6 @@ static void uscp_wake_lock(void)
 {
     if(!wake_lock_active(&uscp_wakelock))
     {
-        hwlog_info("wake lock\n");
         wake_lock(&uscp_wakelock);
     }
 }
@@ -266,7 +265,6 @@ static void uscp_wake_unlock(void)
 {
     if(wake_lock_active(&uscp_wakelock))
     {
-        hwlog_info("wake unlock\n");
         wake_unlock(&uscp_wakelock);
     }
 }
@@ -282,11 +280,9 @@ static void charge_type_handler(struct uscp_device_info* di, enum hisi_charger_t
     {
         if (hrtimer_active(&(di->timer)))
         {
-            hwlog_info("timer already armed , do nothing\n");
         }
         else
         {
-            hwlog_info("start uscp check\n");
             interval = 0;
             first_in = 1;
             /*record 30 seconds after the charger just insert; 30s = (1100 - 1001 + 1)*300ms */
@@ -296,7 +292,6 @@ static void charge_type_handler(struct uscp_device_info* di, enum hisi_charger_t
     }
     else
     {
-        hwlog_info("charger type = %d, do nothing\n", type);
     }
 }
 
@@ -402,8 +397,6 @@ static int get_temperature_value(void)
             adc_temp = get_one_adc_sample();
             temp_array[i] = adc_to_temp(adc_temp);
 
-            hwlog_info("tusb adc value is %d, [%d]=%d\n", adc_temp, i, temp_array[i]);
-
             if (adc_temp < 0)
             {
                 temp_invalid_flag = 1;
@@ -458,23 +451,19 @@ static void set_interval(struct uscp_device_info* di, int temp)
     if (temp > di->interval_switch_temp) {
         di->check_interval = CHECK_INTERVAL_300;//set the check interval 300
         di->keep_check_cnt = 0;
-        hwlog_info("cnt = %d!\n", di->keep_check_cnt);
     } else {
         if (di->keep_check_cnt > CHECK_CNT_LIMIT) {
             /*check the temperature per 0.3 second for 100 times ,when the charger just insert.*/
-            hwlog_info("cnt = %d!\n", di->keep_check_cnt);
             di->keep_check_cnt -= 1;
             di->check_interval = CHECK_INTERVAL_300;
             is_uscp_mode = 0;
         } else if (di->keep_check_cnt == CHECK_CNT_LIMIT) {
             /* reset the flag when the temperature status is stable*/
-            hwlog_info("cnt = %d!\n", di->keep_check_cnt);
             di->keep_check_cnt = -1;
             di->check_interval = CHECK_INTERVAL_10000;//set the check interval 10000
             is_uscp_mode = 0;
             uscp_wake_unlock();
         } else if (di->keep_check_cnt >= 0) {
-            hwlog_info("cnt = %d!\n", di->keep_check_cnt);
             di->keep_check_cnt = di->keep_check_cnt + 1;
             di->check_interval = CHECK_INTERVAL_300;
         } else {
@@ -495,7 +484,6 @@ static void protection_process(struct uscp_device_info* di, int tbatt, int tusb)
         return;
     }
     if (!uscp_enable) {
-        hwlog_info("uscp_enable=%d, usb current protect is disabled!\n", uscp_enable);
         return;
     }
     tdiff = tusb - tbatt;
@@ -567,12 +555,10 @@ static void protection_process(struct uscp_device_info* di, int tbatt, int tusb)
             msleep(SLEEP_10MS);
             charge_set_hiz_enable(HIZ_DISABLE);
             is_hiz_mode = NOT_HIZ_MODE;
-            hwlog_info("pull down gpio_uscp!\n");
         }
         if(is_hiz_mode){
             charge_set_hiz_enable(HIZ_DISABLE);
             is_hiz_mode = NOT_HIZ_MODE;
-            hwlog_info("disable charge hiz!\n");
         }
     } else {
         /*do nothing*/
@@ -593,7 +579,6 @@ static void check_temperature(struct uscp_device_info* di)
     tusb = get_temperature_value();
     usb_temp = tusb;
     tbatt = hisi_battery_temperature();
-    hwlog_info("tusb = %d, tbatt = %d\n", tusb, tbatt);
     tdiff = tusb - tbatt;
 
     if (di->dmd_hiz_enable) {
@@ -601,7 +586,6 @@ static void check_temperature(struct uscp_device_info* di)
 #ifdef CONFIG_HUAWEI_DSM
             if (protect_dmd_notify_enable_hiz) {
                 if (!dsm_client_ocuppy(uscp_client)) {
-                    hwlog_info("record and notify open hiz temp\n");
                     dsm_client_record(uscp_client, "usb short happened,open hiz!\n");
                     dsm_client_notify(uscp_client, ERROR_NO_USB_SHORT_PROTECT_HIZ);
                     protect_dmd_notify_enable_hiz = DMD_NOTIFY_HIZ_DISABLE;
@@ -617,7 +601,6 @@ static void check_temperature(struct uscp_device_info* di)
         if (protect_dmd_notify_enable) {
             if (!dsm_client_ocuppy(uscp_client)) {
                 batt_id = hisi_battery_id_voltage();
-                hwlog_info("record and notify\n");
                 dsm_client_record(uscp_client, "usb short happened,tusb = %d,tbatt = %d,batt_id = %d\n",
                     tusb,tbatt,batt_id);
                 dsm_client_notify(uscp_client, ERROR_NO_USB_SHORT_PROTECT);
@@ -672,7 +655,6 @@ static void uscp_check_work(struct work_struct *work)
 #ifdef CONFIG_DIRECT_CHARGER
         is_scp_charger = 0;
 #endif
-        hwlog_info("chargertype is %d,stop checking\n", type);
         return;
     }
 
@@ -704,7 +686,6 @@ static void check_ntc_error(void)
         sum += get_temperature_value();
     }
     temp = sum / GET_TEMP_VAL_NUM;
-    hwlog_info("check ntc error, temp = %d\n", temp);
     if (temp > CHECK_NTC_TEMP_MAX || temp < CHECK_NTC_TEMP_MIN)
     {
 #ifdef CONFIG_HUAWEI_DSM
@@ -712,7 +693,6 @@ static void check_ntc_error(void)
         {
             tbatt = hisi_battery_temperature();
             batt_id = hisi_battery_id_voltage();
-            hwlog_info("ntc error notify\n");
             dsm_client_record(uscp_client, "ntc error happened,tusb = %d,tbatt = %d,batt_id = %d\n",
                 temp,tbatt,batt_id);
             dsm_client_notify(uscp_client, ERROR_NO_USB_SHORT_PROTECT_NTC);
@@ -722,7 +702,6 @@ static void check_ntc_error(void)
     }
     else
     {
-        hwlog_info("enable usb short protect\n");
         protect_enable = 1;
     }
 }
@@ -761,7 +740,6 @@ static int uscp_probe(struct platform_device *pdev)
     }
 #endif
 
-    hwlog_info("table_size = %lu\n", sizeof(T_A_TABLE)/sizeof(T_A_TABLE[0]));
     is_uscp_mode = 0;
     is_rt_uscp_mode = 0;
     di->keep_check_cnt = CHECK_CNT_INIT;
@@ -773,7 +751,6 @@ static int uscp_probe(struct platform_device *pdev)
         ret = -EINVAL;
         goto free_mem;
     }
-    hwlog_info("gpio_uscp = %d\n", di->gpio_uscp);
 
     ret = gpio_request(di->gpio_uscp, "usb_short_circuit_protect");
     if (ret)
@@ -791,14 +768,12 @@ static int uscp_probe(struct platform_device *pdev)
         ret = -EINVAL;
         goto free_gpio;
     }
-    hwlog_info("adc_channel_uscp = %d\n", di->adc_channel_uscp);
     ret = of_property_read_u32(np, "uscp_threshold_tusb", &(di->uscp_threshold_tusb));
     if (ret)
     {
         di->uscp_threshold_tusb = DEFAULT_TUSB_THRESHOLD;
         hwlog_err("get uscp_threshold_tusb info fail!use default threshold = %d\n",di->uscp_threshold_tusb);
     }
-    hwlog_info("uscp_threshold_tusb = %d\n", di->uscp_threshold_tusb);
     ret = of_property_read_u32(np, "open_mosfet_temp", &(di->open_mosfet_temp));
     if (ret)
     {
@@ -806,21 +781,18 @@ static int uscp_probe(struct platform_device *pdev)
         ret = -EINVAL;
         goto free_gpio;
     }
-    hwlog_info("open_mosfet_temp = %d\n", di->open_mosfet_temp);
     ret = of_property_read_u32(np, "open_hiz_temp", &(di->open_hiz_temp));
     if (ret)
     {
         di->open_hiz_temp = di->open_mosfet_temp;
         hwlog_err("get open_hiz_temp info fail,use default open_mosfet_temp!\n");
     }
-    hwlog_info("open_hiz_temp = %d\n", di->open_hiz_temp);
     ret = of_property_read_u32(np, "dmd_hiz_enable", &(di->dmd_hiz_enable));
     if (ret)
     {
         di->dmd_hiz_enable = DMD_HIZ_DISABLE;
         hwlog_err("get dmd_hiz_enable info fail,use value zero!\n");
     }
-    hwlog_info("dmd_hiz_enable = %d\n", di->dmd_hiz_enable);
     ret = of_property_read_u32(np, "close_mosfet_temp", &(di->close_mosfet_temp));
     if (ret)
     {
@@ -828,7 +800,6 @@ static int uscp_probe(struct platform_device *pdev)
         ret = -EINVAL;
         goto free_gpio;
     }
-    hwlog_info("close_mosfet_temp = %d\n", di->close_mosfet_temp);
     ret = of_property_read_u32(np, "interval_switch_temp", &(di->interval_switch_temp));
     if (ret)
     {
@@ -836,7 +807,6 @@ static int uscp_probe(struct platform_device *pdev)
         ret = -EINVAL;
         goto free_gpio;
     }
-    hwlog_info("interval_switch_temp = %d\n", di->interval_switch_temp);
     check_ntc_error();
     if (!is_hisi_battery_exist()) {
         hwlog_err("battery is not exist, disable usb short protect!\n");
@@ -871,7 +841,6 @@ static int uscp_probe(struct platform_device *pdev)
     }
     charge_type_handler(di, type);
     uscp_probe_ok = true;
-    hwlog_info("uscp probe ok!\n");
     return 0;
 
 free_gpio:
@@ -892,10 +861,8 @@ static int usb_short_circuit_protect_suspend(struct platform_device *pdev, pm_me
         hwlog_err("%s:di is NULL\n", __func__);
         return 0;
     }
-    hwlog_info("%s:+\n", __func__);
     cancel_work_sync(&di->uscp_check_wk);
     hrtimer_cancel(&di->timer);
-    hwlog_info("%s:-\n", __func__);
     return 0;
 }
 static int usb_short_circuit_protect_resume(struct platform_device *pdev)
@@ -909,12 +876,9 @@ static int usb_short_circuit_protect_resume(struct platform_device *pdev)
     enum hisi_charger_type type = hisi_get_charger_type();
     if( CHARGER_TYPE_NONE == type )
     {
-        hwlog_info("%s:charger type = %d\n", __func__,type);
         return 0;
     }
-    hwlog_info("%s:+ charger type = %d\n", __func__,type);
     queue_work(di->uscp_wq, &di->uscp_check_wk);
-    hwlog_info("%s:-\n", __func__);
     return 0;
 }
 #endif
