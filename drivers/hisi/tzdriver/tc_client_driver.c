@@ -354,6 +354,28 @@ static int calc_teecd_path_hash(unsigned char *data, unsigned long len, char *di
 
 static int check_teecd_hash(int type)
 {
+	unsigned char digest[SHA256_DIGEST_LENTH] = {0};
+	if (TEECD_CONNECT != type && SYSTEM_TEECD_CONNECT != type) {
+		tloge("type error! type is %d\n", type);
+		return -EFAULT;
+	}
+
+	if (g_teecd_hash_enable && (TEECD_CONNECT == type)) {
+		if (tee_calc_task_hash(digest, false)
+			|| memcmp(digest, teecd_hash, SHA256_DIGEST_LENTH)) {
+			tloge("compare teecd hash error!\n");
+			return -EFAULT;
+		}
+	}
+
+	if (g_system_teecd_hash_enable && (SYSTEM_TEECD_CONNECT == type)) {
+		if (tee_calc_task_hash(digest, false)
+			|| memcmp(digest, system_teecd_hash, SHA256_DIGEST_LENTH)) {
+			tloge("compare system_teecd hash error!\n");
+			return -EFAULT;
+		}
+	}
+
 	return 0;
 }
 
@@ -429,9 +451,12 @@ static int check_teecd_access(struct task_struct *ca_task, int *type)
 				if (memcmp(digest, ca_hash, SHA256_DIGEST_LENTH) == 0) {
 					local_type = TEECD_CONNECT;
 					ret = 1;
-				} else {
+				} else if (memcmp(digest, system_ca_hash, SHA256_DIGEST_LENTH) == 0){
 					local_type = SYSTEM_TEECD_CONNECT;
 					ret = 1;
+				} else {
+					TCERR("ca_hash error! local_type is %d.\n", local_type);
+					local_type = INVALID_TYPE;
 				}
 				if (NULL != type) {
 					*type = local_type;
@@ -2853,6 +2878,7 @@ static int tc_client_open(struct inode *inode, struct file *file)
 	int ret = TEEC_ERROR_GENERIC;
 	int type = INVALID_TYPE;
 	TC_NS_DEV_File *dev = NULL;
+	bool illegal_type = false;
 	bool teecd_enable = false;
 	bool system_teecd_enable = false;
 
@@ -2861,6 +2887,11 @@ static int tc_client_open(struct inode *inode, struct file *file)
 		return -EPERM;
 	}
 
+	illegal_type = (TEECD_CONNECT != type && SYSTEM_TEECD_CONNECT != type);
+	if (illegal_type) {
+		tloge("type error !! type is %d\n", type);
+		return -EFAULT;
+	}
 	teecd_enable = (!g_teecd_hash_enable) && (TEECD_CONNECT == type);
 	if (teecd_enable) {
 		if (memset_s((void *)teecd_hash,
